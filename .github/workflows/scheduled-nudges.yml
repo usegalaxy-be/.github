@@ -1,0 +1,31 @@
+name: Scheduled triage nudges
+
+on:
+  schedule:
+    - cron: "0 8 * * MON"  # Monday morning, start of each iteration
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Log what would be commented instead of posting"
+        type: boolean
+        default: true
+
+jobs:
+  nudge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip if not activated
+        if: ${{ secrets.PROJECTS_TOKEN == '' }}
+        run: echo "PROJECTS_TOKEN not set, skipping (automation not yet activated)."
+
+      - uses: actions/checkout@v4
+        if: ${{ secrets.PROJECTS_TOKEN != '' }}
+
+      - name: Run nudges
+        if: ${{ secrets.PROJECTS_TOKEN != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ORG: usegalaxy-be
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: python3 scripts/nudge_stale_items.py
