@@ -141,7 +141,10 @@ def main():
             if end < now:
                 comment(url, MARKER_ITERATION,
                         f"This item is still open but its iteration (**{iteration['title']}**, "
-                        f"ended {end.date()}) has passed. Move it to the next iteration or close it.")
+                        f"ended {end.date()}) has passed. If it turned out bigger than expected, split it "
+                        f"into an Epic with sub-issues. Otherwise move it back to Backlog for re-triage "
+                        f"(only pull it straight into the next iteration if it's still the clear priority) "
+                        f"or close it if it's no longer needed.")
 
         if status == "In Progress" and not size:
             comment(url, MARKER_SIZE,
