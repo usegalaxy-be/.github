@@ -20,6 +20,8 @@ Most contributors only need the execution board. The roadmap board is for planni
 
 If an issue is accumulating a checklist of more than 2-3 sub-parts inside its own body, that's a sign it should be an Epic with real sub-issues instead. Sub-issues get their own Status/Priority/Size; the parent Epic shows a automatic completion status.
 
+Epics don't get a Size or an Iteration of their own - that would contradict the reason they're an Epic (too big for one iteration/one size bucket). Each sub-issue is sized and scheduled individually; the Epic's "how big" signal is the sub-issue completion rollup, not a Size value.
+
 
 ## Project board fields
 
@@ -38,7 +40,7 @@ If an issue is accumulating a checklist of more than 2-3 sub-parts inside its ow
 
 Objective options in the field picker show the Key Results under it. A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective.
 
-**Start date / End date**: only set for items with an Iteration, derived from that iteration's window.
+**Start date / End date**: only set for items with an Iteration, derived from that iteration's window. If an item is still open when its iteration ends and gets rolled to the next one, only push the End date forward - leave Start date at its original value. The point is to make slippage visible (the Roadmap bar visibly stretches across iterations) rather than have it quietly reset to looking on-track every cycle.
 
 ## Triage
 
