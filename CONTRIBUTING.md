@@ -44,7 +44,17 @@ Objective options in the field picker show the Key Results under it. A Key Resul
 
 ## Triage
 
-At the start of each iteration: filter the board to Status=Backlog, Pillar=blank, sorted oldest-first. Work down the list - for each item, either set a Pillar/Objective and Priority, or mark it Reactive/not goal-linked. Pull top-priority items into the new iteration until the In Progress column's limit is reached (see column settings on the board - the limit is a soft cap).
+Uses the existing weekly Monday meeting - no separate meeting needed - which alternates between two modes depending on whether it falls on an iteration boundary (every other week; the automated sweep already runs Monday morning, so the board's clean before anyone sits down either week):
+
+**Iteration-boundary Monday** (full triage):
+1. Review items the automation bounced back to Backlog (see below) - still the priority? Pull into the iteration starting now. Not right now? Leave in Backlog. Turned out bigger than expected? Split into an Epic instead of re-entering it as-is.
+2. Finalize the iteration that's starting: review what was staged as "next" two weeks ago, confirm it still makes sense given current capacity and priorities (this is a real review, not a rubber stamp - things change in two weeks), adjust Size/Priority, lock it in.
+3. Triage new Backlog items: filter to Status=Backlog, Pillar=blank, sorted oldest-first. For each, either set a Pillar/Objective and Priority, or mark it Reactive/not goal-linked. Pull top-priority items into the now-current iteration up to the In Progress column's limit (a soft cap, see column settings); stage a few likely candidates into "next" for visibility, to be properly reviewed at the following iteration boundary.
+4. Epic check-in: anything the "no sub-issues after 2 weeks" nudge has flagged, or any Epic close to fully rolled up.
+
+**Mid-iteration Monday** (business as usual): discuss top-priority items, triage any new issues into Backlog (Pillar/Objective/Priority). Nothing iteration-specific - the current iteration is already locked and running.
+
+This is about the execution board (`#8`) and its weekly-to-biweekly rhythm. The strategic roadmap (`#10`, Pillar/Objective progress) runs on a much slower cadence - monthly or quarterly - since "is this Objective on track" isn't a question that changes week to week.
 
 Only genuinely urgent work (something's broken or blocking users right now) skips this and moves straight from Backlog to In Progress. Everything else goes through iteration planning, whether or not it's goal-linked - a deliberately scheduled upgrade or migration is triaged, sized, and scheduled into a cycle the same as goal-linked work, even though it'll end up tagged Reactive/not goal-linked. That tag means "doesn't serve a stated objective," not "wasn't planned" or "isn't important."
 
