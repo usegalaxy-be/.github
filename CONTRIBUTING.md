@@ -40,7 +40,7 @@ Epics don't get a Size or an Iteration of their own - that would contradict the 
 
 Objective options in the field picker show the Key Results under it. A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective.
 
-**Start date / End date**: only set for items with an Iteration, derived from that iteration's window. If an item is still open when its iteration ends and gets rolled to the next one, only push the End date forward - leave Start date at its original value. The point is to make slippage visible (the Roadmap bar visibly stretches across iterations) rather than have it quietly reset to looking on-track every cycle.
+**Start date / End date**: only set for items with an Iteration, derived from that iteration's window, kept in sync automatically. When an item gets a new Iteration and already has a Start date, only End moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and End are set fresh to the new iteration's window.
 
 ## Triage
 
@@ -48,7 +48,9 @@ At the start of each iteration: filter the board to Status=Backlog, Pillar=blank
 
 Only genuinely urgent work (something's broken or blocking users right now) skips this and moves straight from Backlog to In Progress. Everything else goes through iteration planning, whether or not it's goal-linked - a deliberately scheduled upgrade or migration is triaged, sized, and scheduled into a cycle the same as goal-linked work, even though it'll end up tagged Reactive/not goal-linked. That tag means "doesn't serve a stated objective," not "wasn't planned" or "isn't important."
 
-**When an item is still open at the end of its iteration:** if it turned out bigger than expected, that's the Epic signal above. If instead it just didn't get worked on - something else came up, possibly outside usegalaxy.be entirely - move it back to Backlog rather than rolling it straight into the next iteration. Staying "in iteration" implicitly claims it's still what's being worked on; going back to Backlog forces a fresh, cheap re-check at the next triage instead of assuming continuity. Note briefly why in a comment. An item that keeps bouncing back cycle after cycle is itself worth noticing - either it isn't the priority its label says, or capacity is being chronically eaten by work this board doesn't track at all.
+**When an item is still open at the end of its iteration**, this is handled automatically rather than left for someone to remember: it's moved back to Backlog and its Iteration is cleared, with a comment explaining why. Staying "in iteration" would implicitly claim it's still what's being worked on; going back to Backlog forces a fresh, cheap re-check at the next triage instead of assuming continuity. If it was In Progress, Start/End are left as-is (a real trace that work was in flight); if it never actually started, Start/End are cleared too since there's nothing to preserve.
+
+What's still a human call at that point: if it turned out bigger than expected, split it into an Epic instead of re-entering it as-is. Otherwise, decide at the next triage whether it's still the priority (pull it into the new iteration) or not (leave it in Backlog). An item that keeps bouncing back cycle after cycle is itself worth noticing - either it isn't the priority its label says, or capacity is being chronically eaten by work this board doesn't track at all.
 
 ## Pull requests
 
@@ -62,7 +64,8 @@ Automated (see the workflows in this repo, and the board's own Settings > Workfl
 - Reopening an issue resets Status=Backlog
 - Done items are archived from the board after 14 days
 - A `blocked` label mirrors to Status=Blocked (and clears when the label is removed)
-- Items sitting in a completed iteration without being closed get a nudge comment
+- Items still open when their iteration ends are moved back to Backlog with Iteration cleared (Start/End handled per the rules above), with a comment explaining what happened
+- Start/End dates are kept in sync with Iteration whenever it changes
 - Items entering In Progress with no Size set get a nudge comment
 - Epic-typed issues with no sub-issues after some time get a nudge comment
 
@@ -70,4 +73,5 @@ Manual, by design:
 - Setting Priority above the P1/P2 defaults
 - Setting Pillar/Objective
 - Deciding an item is Reactive rather than just untriaged
-- Moving unfinished items out of a completed iteration into the next one
+- Deciding whether an item bumped back to Backlog is still the priority (re-enter it) or not (leave it)
+- Deciding a stuck item should become an Epic instead of being re-entered as-is

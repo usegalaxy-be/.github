@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
-"""Scheduled triage nudges for the usegalaxy-be execution project board.
+"""Scheduled triage sweep for the usegalaxy-be execution project board.
 
-Three checks, each posts at most one comment per item per run, skipped if a
-matching marker comment was already posted in the last 5 days:
+Three checks, run weekly:
   1. Item still open, but its assigned Iteration has already ended.
-  2. Item is Status=In Progress with no Size set.
-  3. Issue is Epic-typed, has no sub-issues, and is >14 days old.
+     ACTION (not just a comment): Status -> Backlog, Iteration cleared.
+     If it was In Progress, Start/End dates are left as-is (a real trace of
+     work in flight). If it was never started, Start/End are cleared too -
+     there's nothing real to preserve. Either way, a comment explains what
+     happened. See scripts/sync_iteration_dates.py for what happens to the
+     dates the next time this item gets a new Iteration assigned.
+  2. Item is Status=In Progress with no Size set: nudge comment only.
+  3. Issue is Epic-typed, has no sub-issues, and is >14 days old: nudge
+     comment only.
 
-Requires GH_TOKEN (a PAT/App token with `project` write scope) and
+Comments are de-duplicated by marker, skipped if already posted in the last
+5 days. Requires GH_TOKEN (a PAT/App token with `project` write scope) and
 ORG / PROJECT_NUMBER env vars. No-ops cleanly if GH_TOKEN is unset, so this
 is safe to enable before the token secret exists.
 """
@@ -21,7 +28,7 @@ ORG = os.environ.get("ORG", "usegalaxy-be")
 PROJECT_NUMBER = os.environ.get("PROJECT_NUMBER")
 DRY_RUN = os.environ.get("DRY_RUN") == "true"
 
-MARKER_ITERATION = "<!-- nudge:stale-iteration -->"
+MARKER_ITERATION = "<!-- nudge:stale-iteration-rollover -->"
 MARKER_SIZE = "<!-- nudge:missing-size -->"
 MARKER_EPIC = "<!-- nudge:epic-no-subissues -->"
 
@@ -42,10 +49,15 @@ def graphql(query):
 
 # Plain (non-f) template: GraphQL is brace-heavy, so we substitute placeholder
 # tokens instead of using str.format()/f-strings to avoid escaping every { and }.
-ITEMS_QUERY_TEMPLATE = '''
+PROJECT_QUERY_TEMPLATE = '''
 query {
   organization(login: "__ORG__") {
     projectV2(number: __PROJECT_NUMBER__) {
+      id
+      statusField: field(name: "Status") { ... on ProjectV2SingleSelectField { id options { id name } } }
+      iterationField: field(name: "Iteration") { ... on ProjectV2IterationField { id } }
+      startField: field(name: "Start date") { ... on ProjectV2FieldCommon { id } }
+      endField: field(name: "End date") { ... on ProjectV2FieldCommon { id } }
       items(first: 100__AFTER__) {
         pageInfo { hasNextPage endCursor }
         nodes {
@@ -61,6 +73,7 @@ query {
           status: fieldValueByName(name: "Status") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
           size: fieldValueByName(name: "Size") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
           iteration: fieldValueByName(name: "Iteration") { ... on ProjectV2ItemFieldIterationValue { title startDate duration } }
+          startDate: fieldValueByName(name: "Start date") { ... on ProjectV2ItemFieldDateValue { date } }
         }
       }
     }
@@ -69,24 +82,35 @@ query {
 '''
 
 
-def fetch_project_items():
+def fetch_project():
     items = []
     cursor = None
+    project_meta = None
     while True:
         after = f', after: "{cursor}"' if cursor else ""
-        q = (ITEMS_QUERY_TEMPLATE
+        q = (PROJECT_QUERY_TEMPLATE
              .replace("__ORG__", ORG)
              .replace("__PROJECT_NUMBER__", str(PROJECT_NUMBER))
              .replace("__AFTER__", after))
         data = graphql(q)
         if not data or not data.get("data", {}).get("organization", {}).get("projectV2"):
             break
-        page = data["data"]["organization"]["projectV2"]["items"]
+        project = data["data"]["organization"]["projectV2"]
+        if project_meta is None:
+            project_meta = {
+                "id": project["id"],
+                "status_field_id": project["statusField"]["id"],
+                "status_options": {o["name"]: o["id"] for o in project["statusField"]["options"]},
+                "iteration_field_id": project["iterationField"]["id"],
+                "start_field_id": project["startField"]["id"],
+                "end_field_id": project["endField"]["id"],
+            }
+        page = project["items"]
         items.extend(page["nodes"])
         if not page["pageInfo"]["hasNextPage"]:
             break
         cursor = page["pageInfo"]["endCursor"]
-    return items
+    return project_meta, items
 
 
 def has_recent_marker(issue_url, marker, days=5):
@@ -94,7 +118,6 @@ def has_recent_marker(issue_url, marker, days=5):
              "-q", ".comments[].body"])
     if r.returncode != 0:
         return False
-    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     # cheap check: marker present anywhere in recent output is good enough here,
     # comment timestamps aren't in this projection so we accept "posted this run
     # or a previous one this week" as sufficient de-dup for a weekly cron.
@@ -112,6 +135,31 @@ def comment(issue_url, marker, body):
     print(f"commented on {issue_url}")
 
 
+def set_select(project_id, item_id, field_id, option_id):
+    if DRY_RUN:
+        print(f"[dry-run] would set field {field_id} on {item_id} to option {option_id}")
+        return
+    m = f'''mutation {{
+      updateProjectV2ItemFieldValue(input: {{
+        projectId: "{project_id}", itemId: "{item_id}", fieldId: "{field_id}",
+        value: {{ singleSelectOptionId: "{option_id}" }}
+      }}) {{ projectV2Item {{ id }} }}
+    }}'''
+    graphql(m)
+
+
+def clear_field(project_id, item_id, field_id):
+    if DRY_RUN:
+        print(f"[dry-run] would clear field {field_id} on {item_id}")
+        return
+    m = f'''mutation {{
+      clearProjectV2ItemFieldValue(input: {{
+        projectId: "{project_id}", itemId: "{item_id}", fieldId: "{field_id}"
+      }}) {{ projectV2Item {{ id }} }}
+    }}'''
+    graphql(m)
+
+
 def main():
     if not os.environ.get("GH_TOKEN"):
         print("GH_TOKEN not set, skipping (automation not yet activated)")
@@ -120,7 +168,10 @@ def main():
         print("PROJECT_NUMBER not set, skipping")
         return
 
-    items = fetch_project_items()
+    project, items = fetch_project()
+    if not project:
+        print("could not load project, skipping")
+        return
     now = datetime.now(timezone.utc)
 
     for item in items:
@@ -139,12 +190,24 @@ def main():
             start = datetime.fromisoformat(iteration["startDate"]).replace(tzinfo=timezone.utc)
             end = start + timedelta(days=iteration["duration"] - 1)
             if end < now:
+                was_in_progress = status == "In Progress"
+                set_select(project["id"], item["id"], project["status_field_id"],
+                           project["status_options"]["Backlog"])
+                clear_field(project["id"], item["id"], project["iteration_field_id"])
+                if was_in_progress:
+                    note = ("It was In Progress, so Start/End dates are left as-is - a visible "
+                            "record that real work was in flight from Start through the iteration "
+                            "that just ended.")
+                else:
+                    clear_field(project["id"], item["id"], project["start_field_id"])
+                    clear_field(project["id"], item["id"], project["end_field_id"])
+                    note = "It was never started, so Start/End dates were cleared too."
                 comment(url, MARKER_ITERATION,
-                        f"This item is still open but its iteration (**{iteration['title']}**, "
-                        f"ended {end.date()}) has passed. If it turned out bigger than expected, split it "
-                        f"into an Epic with sub-issues. Otherwise move it back to Backlog for re-triage "
-                        f"(only pull it straight into the next iteration if it's still the clear priority) "
-                        f"or close it if it's no longer needed.")
+                        f"Its iteration (**{iteration['title']}**, ended {end.date()}) has passed "
+                        f"and this is still open, so it's been moved back to **Backlog** and its "
+                        f"Iteration cleared for re-triage. {note}\n\n"
+                        f"If it turned out bigger than expected, split it into an Epic with "
+                        f"sub-issues instead of re-entering it as-is.")
 
         if status == "In Progress" and not size:
             comment(url, MARKER_SIZE,
