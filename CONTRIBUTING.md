@@ -68,13 +68,23 @@ What's still a human call at that point: if it turned out bigger than expected, 
 
 ## Pull requests
 
-Link every PR to the issue it resolves (`Closes #123` in the description). A merged PR automatically closes the linked issue and moves it to Status=Done - see Automation below. Use draft PRs for work-in-progress; mark ready for review only once it's actually reviewable.
+Merging is not the same as done. Most of this work deploys via a separate playbook run, not CI/CD on merge - a merged PR just means the code is in `main`, not that it's live. Status=Done only happens when the issue is actually closed, and that's a decision for whoever verifies the deploy, not something that fires automatically on merge.
+
+How you reference the issue in the PR depends on which is true for that repo/change:
+- **Merge effectively is deploy** (e.g. a docs site that publishes on merge): use `Closes #123`. GitHub auto-closes the issue when this PR merges, which then triggers Status=Done. Fine as-is.
+- **Merge triggers a later deploy step** (most repos, most of the time): use `Relates to #123` instead. This links the PR to the issue for traceability without auto-closing anything. Close the issue by hand once the deploy is verified.
+
+This also settles what to do about multiple PRs on one issue: since closing is decoupled from any individual PR merging, it doesn't matter how many PRs are linked or in what order they merge - closing is still one deliberate action once the work is actually live. Don't put `Closes #123` on more than one PR for the same issue if that issue's deploy is gated - GitHub closes the issue the moment *any* of them merges, regardless of the others.
+
+Multiple PRs on one issue isn't automatically a sign it should have been split - a small, well-scoped change can genuinely need PRs in more than one repo (GitHub doesn't allow a PR to span repos), and follow-up/fixup PRs are normal. Worth a second look during the Epic check-in only if there are several PRs and none of them look like an obvious cross-repo split.
+
+Use draft PRs for work-in-progress; mark ready for review only once it's actually reviewable.
 
 ## What's automated vs. manual
 
 Automated (see the workflows in this repo, and the board's own Settings > Workflows):
 - New issues/PRs are added to the execution board with Status=Backlog
-- Closing an issue, or merging its linked PR, sets Status=Done
+- Closing an issue sets Status=Done (merging a linked PR does not, by itself - see Pull requests above)
 - Reopening an issue resets Status=Backlog
 - Done items are archived from the board after 14 days
 - A `blocked` label mirrors to Status=Blocked (and clears when the label is removed)
@@ -90,3 +100,4 @@ Manual, by design:
 - Deciding whether an item bumped back to Backlog is still the priority (re-enter it) or not (leave it)
 - Deciding a stuck item should become an Epic instead of being re-entered as-is
 - Setting/revisiting an Epic's Start/Target dates
+- Closing an issue once its deploy is verified (for anything not using `Closes #123`)

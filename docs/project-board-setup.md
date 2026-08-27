@@ -11,14 +11,15 @@ GitHub doesn't expose creating/editing a Project's built-in workflows via API, s
 | Item added to project | Set Status: Backlog |
 | Item reopened | Set Status: Backlog |
 | Item closed | Set Status: Done |
-| Pull request merged | Set Status: Done |
 | Auto-archive items | Archive items where Status = Done, 14 days after being set |
+
+Deliberately **not** configuring "Pull request merged -> Status: Done" - see the Pull requests section in CONTRIBUTING.md. Merging isn't deploying for most of this work, and that rule fires on any linked PR merging regardless of deploy state or how many other PRs are still open on the same issue. Closing (via `Closes #123` on a merge-is-deploy repo, or by hand once a deploy is verified) is the only thing that should set Done.
 
 Also confirm **auto-add** (same menu) is scoped to include all 8 tracked repos.
 
 ## 2. Activating the Actions in this repo
 
-The workflows in `.github/workflows/` here (`scheduled-nudges.yml`, `label-status-sync.yml`) are committed but inert - every job checks for a `PROJECTS_TOKEN` secret and no-ops if it's missing, so nothing runs or fails noisily until you turn it on.
+The workflows in `.github/workflows/` here (`scheduled-nudges.yml`, `sync-iteration-dates.yml`, `label-status-sync.yml`) are committed but inert - every job checks for a `PROJECTS_TOKEN` secret and no-ops if it's missing, so nothing runs or fails noisily until you turn it on.
 
 To activate:
 
