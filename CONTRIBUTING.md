@@ -35,7 +35,7 @@ Epics don't get a Size or an Iteration of their own - that would contradict the 
 
 **Pillar / Objective**: which 2026 goal (from the goals document) this work serves, if any. Three states matter, and the difference between the first two is deliberate:
 - *Blank* = not yet triaged
-- *Reactive / not goal-linked* = triaged, confirmed this doesn't serve a stated objective (most break-fix and tool-maintenance work falls here, and that's expected, not a problem)
+- *Reactive / not goal-linked* = triaged, confirmed this doesn't serve a stated objective - covers both spontaneous break-fix work and deliberately planned work (e.g. a scheduled upgrade) that just isn't tied to a 2026 goal. Both are expected, not a problem; this tag is about goal-linkage, not about whether the work was planned or matters.
 - *A pillar set* = triaged, goal-linked
 
 Objective options in the field picker show the Key Results under it. A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective.
@@ -46,7 +46,9 @@ Objective options in the field picker show the Key Results under it. A Key Resul
 
 At the start of each iteration: filter the board to Status=Backlog, Pillar=blank, sorted oldest-first. Work down the list - for each item, either set a Pillar/Objective and Priority, or mark it Reactive/not goal-linked. Pull top-priority items into the new iteration until the In Progress column's limit is reached (see column settings on the board - the limit is a soft cap).
 
-Reactive work doesn't need to wait for triage or an iteration assignment - it can move straight from Backlog to In Progress as it comes up. Iteration planning is for goal-linked and/or plannable work.
+Only genuinely urgent work (something's broken or blocking users right now) skips this and moves straight from Backlog to In Progress. Everything else goes through iteration planning, whether or not it's goal-linked - a deliberately scheduled upgrade or migration is triaged, sized, and scheduled into a cycle the same as goal-linked work, even though it'll end up tagged Reactive/not goal-linked. That tag means "doesn't serve a stated objective," not "wasn't planned" or "isn't important."
+
+**When an item is still open at the end of its iteration:** if it turned out bigger than expected, that's the Epic signal above. If instead it just didn't get worked on - something else came up, possibly outside usegalaxy.be entirely - move it back to Backlog rather than rolling it straight into the next iteration. Staying "in iteration" implicitly claims it's still what's being worked on; going back to Backlog forces a fresh, cheap re-check at the next triage instead of assuming continuity. Note briefly why in a comment. An item that keeps bouncing back cycle after cycle is itself worth noticing - either it isn't the priority its label says, or capacity is being chronically eaten by work this board doesn't track at all.
 
 ## Pull requests
 
