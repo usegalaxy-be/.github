@@ -22,12 +22,16 @@ If an issue is accumulating a checklist of more than 2-3 sub-parts inside its ow
 
 Epics don't get a Size or an Iteration of their own - that would contradict the reason they're an Epic (too big for one iteration/one size bucket). Each sub-issue is sized and scheduled individually; the Epic's "how big" signal is the sub-issue completion rollup, not a Size value.
 
+Epics *do* get their own Start/Target dates - set independently, not derived from anything, at whatever grain makes sense for the initiative (weeks to a quarter). This is the one exception to "dates come from Iteration": Epics have no Iteration, but the Roadmap view needs something to place them on a quarterly timeline, and a multi-cycle initiative's real timeframe is a judgment call, not a mechanical derivation. Set it during triage or whenever the Epic is created, and revisit it the way Priority gets revisited - it's an estimate, not automated.
+
 
 ## Project board fields
 
 **Status**: Backlog / In Progress / Blocked / Done. Kept deliberately small so it can be driven by automation (see below).
 
 **Priority**: P0 / P1 / P2. P0 is reserved for genuine escalations - never set automatically. As a starting default: goal-linked work (has a Pillar) defaults to P1, reactive work defaults to P2. Adjust as needed during triage.
+
+Unlike Size and Iteration, Priority applies to Epics too - it's about relative importance, not execution scheduling, so it isn't tied to fitting in one cycle. An Epic's Priority is what should drive which initiatives get staffed; a sub-issue's Priority is more about ordering work within an Epic that's already been deemed worth doing.
 
 **Size**: XS-XL. Set when an item is triaged into an iteration, not before. A single (non-Epic) issue should be scoped to fit inside **one** iteration (2 weeks) - not planned across two from the start. If it can't realistically finish in one iteration, that's the signal to convert it to an Epic and split it into sub-issues, not to plan on rolling it into a second cycle. Rolling over is for the exceptional case where something unexpectedly slips, not a normal planning outcome - see the Start/End date note below.
 
@@ -40,7 +44,7 @@ Epics don't get a Size or an Iteration of their own - that would contradict the 
 
 Objective options in the field picker show the Key Results under it. A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective.
 
-**Start date / End date**: only set for items with an Iteration, derived from that iteration's window, kept in sync automatically. When an item gets a new Iteration and already has a Start date, only End moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and End are set fresh to the new iteration's window.
+**Start date / End date**: for regular (non-Epic) issues, only set for items with an Iteration, derived from that iteration's window, kept in sync automatically. Epics are the exception - see Issue types above, their dates are set independently rather than derived. When an item gets a new Iteration and already has a Start date, only End moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and End are set fresh to the new iteration's window.
 
 ## Triage
 
@@ -49,7 +53,7 @@ Uses the existing weekly Monday meeting - no separate meeting needed - which alt
 **Iteration-boundary Monday** (full triage):
 1. Review items the automation bounced back to Backlog (see below) - still the priority? Pull into the iteration starting now. Not right now? Leave in Backlog. Turned out bigger than expected? Split into an Epic instead of re-entering it as-is.
 2. Finalize the iteration that's starting: review what was staged as "next" two weeks ago, confirm it still makes sense given current capacity and priorities (this is a real review, not a rubber stamp - things change in two weeks), adjust Size/Priority, lock it in.
-3. Triage new Backlog items: filter to Status=Backlog, Pillar=blank, sorted oldest-first. For each, either set a Pillar/Objective and Priority, or mark it Reactive/not goal-linked. Pull top-priority items into the now-current iteration up to the In Progress column's limit (a soft cap, see column settings); stage a few likely candidates into "next" for visibility, to be properly reviewed at the following iteration boundary.
+3. Triage new Backlog items: the board's **Triage** view (Status=Backlog, Pillar=blank, sorted oldest-first). For each, either set a Pillar/Objective and Priority, or mark it Reactive/not goal-linked. Pull top-priority items into the now-current iteration up to the In Progress column's limit (a soft cap, see column settings); stage a few likely candidates into "next" for visibility, to be properly reviewed at the following iteration boundary.
 4. Epic check-in: anything the "no sub-issues after 2 weeks" nudge has flagged, or any Epic close to fully rolled up.
 
 **Mid-iteration Monday** (business as usual): discuss top-priority items, triage any new issues into Backlog (Pillar/Objective/Priority). Nothing iteration-specific - the current iteration is already locked and running.
@@ -85,3 +89,4 @@ Manual, by design:
 - Deciding an item is Reactive rather than just untriaged
 - Deciding whether an item bumped back to Backlog is still the priority (re-enter it) or not (leave it)
 - Deciding a stuck item should become an Epic instead of being re-entered as-is
+- Setting/revisiting an Epic's Start/Target dates
