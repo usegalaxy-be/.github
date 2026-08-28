@@ -44,7 +44,7 @@ Unlike Size and Iteration, Priority applies to Epics too - it's about relative i
 - *Reactive / not goal-linked* = triaged, confirmed this doesn't serve a stated objective - covers both spontaneous break-fix work and deliberately planned work (e.g. a scheduled upgrade) that just isn't tied to a 2026 goal. Both are expected, not a problem; this tag is about goal-linkage, not about whether the work was planned or matters.
 - *A pillar set* = triaged, goal-linked
 
-Objective options in the field picker show the Key Results under it. A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective.
+Objective options in the field picker show the Key Results under it. A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective - also add the `OKR` label and an `[OKR]` title prefix, for visibility outside the project board too.
 
 **Start date / End date**: for regular (non-Epic) issues are automatically derived from that iteration's window, kept in sync automatically. Epics are the exception - see Issue types above, their dates are set independently rather than derived. When an item gets a new Iteration and already has a Start date, only End moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and End are set fresh to the new iteration's window.
 
