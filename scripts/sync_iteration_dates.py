@@ -35,7 +35,7 @@ query {
         pageInfo { hasNextPage endCursor }
         nodes {
           id
-          content { ... on Issue { url } }
+          content { ... on Issue { url labels(first: 20) { nodes { name } } } }
           iteration: fieldValueByName(name: "Iteration") { ... on ProjectV2ItemFieldIterationValue { title startDate duration } }
           startDate: fieldValueByName(name: "Start date") { ... on ProjectV2ItemFieldDateValue { date } }
           endDate: fieldValueByName(name: "End date") { ... on ProjectV2ItemFieldDateValue { date } }
@@ -102,6 +102,13 @@ def set_date(project_id, item_id, field_id, date_str):
     graphql(m)
 
 
+def remove_label(issue_url, label):
+    if DRY_RUN:
+        print(f"[dry-run] would remove label '{label}' from {issue_url}")
+        return
+    run(["gh", "issue", "edit", issue_url, "--remove-label", label])
+
+
 def main():
     if not os.environ.get("GH_TOKEN"):
         print("GH_TOKEN not set, skipping (automation not yet activated)")
@@ -121,6 +128,7 @@ def main():
             continue
         content = item.get("content") or {}
         url = content.get("url", item["id"])
+        labels = {n["name"] for n in (content.get("labels") or {}).get("nodes", [])}
 
         iter_start = datetime.fromisoformat(iteration["startDate"]).date()
         iter_end = iter_start + timedelta(days=iteration["duration"] - 1)
@@ -128,6 +136,12 @@ def main():
         current_end = (item.get("endDate") or {}).get("date")
         if current_end == str(iter_end):
             continue  # already consistent, nothing to do
+
+        # A real Iteration (re)assignment just happened - if this item was
+        # sitting with needs-retriage (bounced back by nudge_stale_items.py),
+        # that's now resolved.
+        if "needs-retriage" in labels:
+            remove_label(url, "needs-retriage")
 
         current_start = (item.get("startDate") or {}).get("date")
         if current_start:

@@ -125,6 +125,13 @@ def has_recent_marker(issue_url, marker, days=5):
     return marker in r.stdout
 
 
+def add_label(issue_url, label):
+    if DRY_RUN:
+        print(f"[dry-run] would add label '{label}' to {issue_url}")
+        return
+    run(["gh", "issue", "edit", issue_url, "--add-label", label])
+
+
 def comment(issue_url, marker, body):
     if has_recent_marker(issue_url, marker):
         return
@@ -197,6 +204,7 @@ def main():
                 set_select(project["id"], item["id"], project["status_field_id"],
                            project["status_options"]["Backlog"])
                 clear_field(project["id"], item["id"], project["iteration_field_id"])
+                add_label(url, "needs-retriage")
                 if was_in_progress:
                     note = ("It was In Progress, so Start/End dates are left as-is - a visible "
                             "record that real work was in flight from Start through the iteration "
