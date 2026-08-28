@@ -6,7 +6,7 @@ Not GitHub-specific. The methodology this workflow is based on.
 - [The Scrum Guide](https://scrumguides.org/scrum-guide.html) - why a short, fixed-length iteration
 
 **Triage**
-- [Product Backlog Refinement - Scrum.org](https://www.scrum.org/resources/product-backlog-refinement) - recurring backlog pass, kept separate from cycle-start planning
+- [Product Backlog Refinement - Scrum.org](https://www.scrum.org/resources/product-backlog-refinement) - recurring backlog pass
 - [Scrum, Kanban and Unplanned Work](https://connected-knowledge.com/2013/07/25/scrum-kanban-and-unplanned-work/) - why urgent work skips triage instead of going through the same queue
 
 **Epics / sub-issues**
