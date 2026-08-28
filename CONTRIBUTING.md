@@ -52,9 +52,9 @@ Objective options in the field picker show the Key Results under it. A Key Resul
 
 Use the existing weekly Monday meeting when a new iteration starts (every other week):
 
-**Iteration-boundary Monday** (full triage):
+**Iteration-boundary Monday** (full triage): covers two iterations - the one starting now (finalized, real commitment) and the one after that (light preview only, see below). The second one matters less; don't spend equal effort on it.
 1. Review the **Needs Re-triage** view (items the automation bounced back to Backlog) - still the priority? Pull into the iteration starting now. Not right now? Leave in Backlog. Turned out bigger than expected? Split into an Epic instead of re-entering it as-is.
-2. Finalize the iteration that's starting: review what was staged as "next up" two weeks ago, confirm it still makes sense given current capacity and priorities, adjust Size/Priority if needed.
+2. Finalize the iteration that's starting: items staged as "next up" at the last triage are a non-binding preview, not a commitment - re-review each one now that it's real (given current capacity and priorities), don't rubber-stamp. This is issue-level and one iteration ahead only; picking which Objectives matter this quarter is a separate, coarser decision made at quarterly planning, not here.
 3. Triage new Backlog items: the board's **Triage** view (Status=Backlog, Pillar=blank, sorted oldest-first). For each, either set a Pillar/Objective and Priority, or mark it Reactive/not goal-linked. Pull top-priority items into the now-current iteration up to the In Progress column's limit (a soft cap, see column settings); stage a few likely candidates into "next" for visibility, to be properly reviewed at the following iteration boundary.
 4. Epic check-in: anything the "no sub-issues after 2 weeks" nudge has flagged, or any Epic close to fully rolled up.
 
