@@ -20,11 +20,11 @@ Most contributors only need the execution board. The roadmap board is for planni
 
 If an issue is accumulating a checklist of more than 2-3 sub-parts inside its own body, that's a sign it should be an Epic with real sub-issues instead. Sub-issues get their own Status/Priority/Size; the parent Epic shows a automatic completion status.
 
-Epics don't get a Size or an Iteration of their own - that would contradict the reason they're an Epic (too big for one iteration/one size bucket). Each sub-issue is sized and scheduled individually; the Epic's "how big" signal is the sub-issue completion rollup, not a Size value.
+Epics don't get a Size or an Iteration of their own. Each sub-issue is sized and scheduled individually.
 
-Epics *do* get their own Start/Target dates - set independently, not derived from anything, at whatever grain makes sense for the initiative (weeks to a quarter). This is the one exception to "dates come from Iteration": Epics have no Iteration, but the Roadmap view needs something to place them on a quarterly timeline, and a multi-cycle initiative's real timeframe is a judgment call, not a mechanical derivation. Set it during triage or whenever the Epic is created, and revisit it the way Priority gets revisited - it's an estimate, not automated.
+Epics *do* get their own Start/Target/End dates this is because the Roadmap view needs something to place them on a quarterly timeline, this needs to be set it during triage and/or during roadmap planning.
 
-It's fine, and often more honest, for a non-committed Epic to have **no** Target date at all rather than a fabricated one. A blank Target date correctly says "on the radar, not committed" - only set a real one when there's an actual driver (a leadership commitment, an external deadline, something else depending on it). Don't invent a quarter just to make the Roadmap look populated.
+Some Epics don't need a Target date set. We only set a real date when there's an actual driver (a leadership commitment, an external deadline, something else depending on it).
 
 
 ## Project board fields
