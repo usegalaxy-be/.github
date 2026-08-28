@@ -68,6 +68,7 @@ query {
               repository { name }
               issueType { name }
               subIssuesSummary { total }
+              labels(first: 20) { nodes { name } }
             }
           }
           status: fieldValueByName(name: "Status") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
@@ -185,6 +186,8 @@ def main():
         issue_type = (content.get("issueType") or {}).get("name")
         sub_total = (content.get("subIssuesSummary") or {}).get("total", 0)
         created_at = datetime.fromisoformat(content["createdAt"].replace("Z", "+00:00"))
+        labels = {n["name"] for n in (content.get("labels") or {}).get("nodes", [])}
+        is_opportunistic = "opportunistic" in labels
 
         if status != "Done" and iteration:
             start = datetime.fromisoformat(iteration["startDate"]).replace(tzinfo=timezone.utc)
@@ -209,7 +212,7 @@ def main():
                         f"If it turned out bigger than expected, split it into an Epic with "
                         f"sub-issues instead of re-entering it as-is.")
 
-        if status == "In Progress" and not size:
+        if status == "In Progress" and not size and issue_type != "Epic" and not is_opportunistic:
             comment(url, MARKER_SIZE,
                     "This item is In Progress with no Size set. Add one, or if it feels too big, "
                     "consider splitting it into sub-issues.")
