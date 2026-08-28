@@ -103,3 +103,5 @@ Manual, by design:
 - Deciding a stuck item should become an Epic instead of being re-entered as-is
 - Setting/revisiting an Epic's Start/Target dates
 - Closing an issue once its deploy is verified (for anything not using `Closes #123`)
+
+See [docs/references.md](docs/references.md) for the non-GitHub-specific methodology this is based on.
