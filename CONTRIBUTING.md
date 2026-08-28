@@ -24,9 +24,9 @@ If an issue is accumulating a checklist of more than 2-3 sub-parts inside its ow
 
 Epics don't get a Size or an Iteration of their own. Each sub-issue is sized and scheduled individually.
 
-Epics *do* get their own Start/Target/End dates this is because the Roadmap view needs something to place them on a quarterly timeline, this needs to be set it during triage and/or during roadmap planning.
+Epics *do* get their own Start/Target/End dates - Target and End are different things and both matter: Target is the estimate (a projection, revisable as things change), End is filled in only once the Epic is actually done, recording what really happened. The gap between the two is useful information on its own (how far off was the estimate), not just planning noise.
 
-Some Epics don't need a Target date set. We only set a real date when there's an actual driver (a leadership commitment, an external deadline, something else depending on it).
+Some Epics don't need a Target date set. We only set a real one when there's an actual driver (a leadership commitment, an external deadline, something else depending on it) - a rough estimate is fine, it doesn't need to be a hard commitment, but it needs *some* genuine basis. Don't set End before the Epic is genuinely finished.
 
 
 ## Project board fields
@@ -37,7 +37,7 @@ Some Epics don't need a Target date set. We only set a real date when there's an
 
 Unlike Size and Iteration, Priority applies to Epics too - it's about relative importance, not execution scheduling, so it isn't tied to fitting in one cycle. An Epic's Priority is what should drive which initiatives get staffed; a sub-issue's Priority is more about ordering work within an Epic that's already been deemed worth doing.
 
-**Size**: XS-XL. Set when an item is triaged into an iteration, not before. A single (non-Epic) issue should be scoped to fit inside **one** iteration (2 weeks) - not planned across two from the start. If it can't realistically finish in one iteration, that's the signal to convert it to an Epic and split it into sub-issues, not to plan on rolling it into a second cycle. Rolling over is for the exceptional case where something unexpectedly slips, not a normal planning outcome - see the Start/End date note below.
+**Size**: XS-XL. Set when an item is triaged into an iteration, not before. A single (non-Epic) issue should be scoped to fit inside **one** iteration (2 weeks) - not planned across two from the start. If it can't realistically finish in one iteration, that's the signal to convert it to an Epic and split it into sub-issues, not to plan on rolling it into a second cycle. Rolling over is for the exceptional case where something unexpectedly slips, not a normal planning outcome - see the Start/Target date note below.
 
 **Iteration**: 2-week cycles, Monday to Sunday. Represents "what cycle is this planned for," not a deadline. Only items actively planned for the current or next cycle should have one set.
 
@@ -48,7 +48,9 @@ Unlike Size and Iteration, Priority applies to Epics too - it's about relative i
 
 Objective options in the field picker show the Key Results under it. A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective - also add the `OKR` label and an `[OKR]` title prefix, for visibility outside the project board too.
 
-**Start date / End date**: for regular (non-Epic) issues are automatically derived from that iteration's window, kept in sync automatically. Epics are the exception - see Issue types above, their dates are set independently rather than derived. When an item gets a new Iteration and already has a Start date, only End moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and End are set fresh to the new iteration's window.
+**Start date / Target date**: for regular (non-Epic) issues, automatically derived from the Iteration's window and kept in sync. Epics are the exception - see Issue types above, their Start/Target/End are set independently rather than derived. When a regular issue gets a new Iteration and already has a Start date, only Target moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and Target are set fresh to the new iteration's window.
+
+**End date**: Epic-only, manual. Not derived from anything, not touched by automation. Only set once an Epic is genuinely done - it's a record of what actually happened, not a plan.
 
 ## Triage
 
@@ -68,7 +70,7 @@ There's a third type of work besides "urgent, skips the queue" and "goal-linked"
 
 Sequencing goal-linked work is decided at quarterly roadmap review, at the Epic level, not the Objective level - see [docs/quarterly-planning.md](docs/quarterly-planning.md). Only Epics picked as in-focus get pulled into iterations; the rest stay tagged and visible on the roadmap.
 
-**When an item is still open at the end of its iteration**, this is handled automatically rather than left for someone to remember: it's moved back to Backlog and its Iteration is cleared, with a comment explaining why. Staying "in iteration" would implicitly claim it's still what's being worked on; going back to Backlog forces a fresh re-check at the next triage instead of assuming continuity. If it was In Progress, Start/End are left as-is (a real trace that work was in flight); if it never actually started, Start/End are cleared too since there's nothing to preserve.
+**When an item is still open at the end of its iteration**, this is handled automatically rather than left for someone to remember: it's moved back to Backlog and its Iteration is cleared, with a comment explaining why. Staying "in iteration" would implicitly claim it's still what's being worked on; going back to Backlog forces a fresh re-check at the next triage instead of assuming continuity. If it was In Progress, Start/Target are left as-is (a real trace that work was in flight); if it never actually started, Start/Target are cleared too since there's nothing to preserve.
 
 What's still a human call at that point: if it turned out bigger than expected, split it into an Epic instead of re-entering it as-is. Otherwise, decide at the next triage whether it's still the priority (pull it into the new iteration) or not (leave it in Backlog). An item that keeps bouncing back cycle after cycle is itself worth noticing - either it isn't the priority its label says, or capacity is being chronically eaten by work this board doesn't track at all.
 
@@ -92,8 +94,8 @@ Automated (see the workflows in this repo, and the board's own Settings > Workfl
 - Reopening an issue resets Status=Backlog
 - Done items are archived from the board after 14 days
 - A `blocked` label mirrors to Status=Blocked (and clears when the label is removed)
-- Items still open when their iteration ends are moved back to Backlog with Iteration cleared (Start/End handled per the rules above), with a comment explaining what happened
-- Start/End dates are kept in sync with Iteration whenever it changes
+- Items still open when their iteration ends are moved back to Backlog with Iteration cleared (Start/Target handled per the rules above), with a comment explaining what happened
+- Start/Target dates are kept in sync with Iteration whenever it changes
 - Items entering In Progress with no Size set get a nudge comment
 - Epic-typed issues with no sub-issues after some time get a nudge comment
 
@@ -103,7 +105,7 @@ Manual, by design:
 - Deciding an item is Reactive rather than just untriaged
 - Deciding whether an item bumped back to Backlog is still the priority (re-enter it) or not (leave it)
 - Deciding a stuck item should become an Epic instead of being re-entered as-is
-- Setting/revisiting an Epic's Start/Target dates
+- Setting/revisiting an Epic's Start/Target dates, and setting End once it's genuinely done
 - Closing an issue once its deploy is verified (for anything not using `Closes #123`)
 
 See [docs/references.md](docs/references.md) for the non-GitHub-specific methodology this is based on.

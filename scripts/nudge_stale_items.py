@@ -4,8 +4,8 @@
 Three checks, run weekly:
   1. Item still open, but its assigned Iteration has already ended.
      ACTION (not just a comment): Status -> Backlog, Iteration cleared.
-     If it was In Progress, Start/End dates are left as-is (a real trace of
-     work in flight). If it was never started, Start/End are cleared too -
+     If it was In Progress, Start/Target dates are left as-is (a real trace of
+     work in flight). If it was never started, Start/Target are cleared too -
      there's nothing real to preserve. Either way, a comment explains what
      happened. See scripts/sync_iteration_dates.py for what happens to the
      dates the next time this item gets a new Iteration assigned.
@@ -57,7 +57,7 @@ query {
       statusField: field(name: "Status") { ... on ProjectV2SingleSelectField { id options { id name } } }
       iterationField: field(name: "Iteration") { ... on ProjectV2IterationField { id } }
       startField: field(name: "Start date") { ... on ProjectV2FieldCommon { id } }
-      endField: field(name: "End date") { ... on ProjectV2FieldCommon { id } }
+      endField: field(name: "Target date") { ... on ProjectV2FieldCommon { id } }
       items(first: 100__AFTER__) {
         pageInfo { hasNextPage endCursor }
         nodes {
@@ -206,13 +206,13 @@ def main():
                 clear_field(project["id"], item["id"], project["iteration_field_id"])
                 add_label(url, "needs-retriage")
                 if was_in_progress:
-                    note = ("It was In Progress, so Start/End dates are left as-is - a visible "
+                    note = ("It was In Progress, so Start/Target dates are left as-is - a visible "
                             "record that real work was in flight from Start through the iteration "
                             "that just ended.")
                 else:
                     clear_field(project["id"], item["id"], project["start_field_id"])
                     clear_field(project["id"], item["id"], project["end_field_id"])
-                    note = "It was never started, so Start/End dates were cleared too."
+                    note = "It was never started, so Start/Target dates were cleared too."
                 comment(url, MARKER_ITERATION,
                         f"Its iteration (**{iteration['title']}**, ended {end.date()}) has passed "
                         f"and this is still open, so it's been moved back to **Backlog** and its "

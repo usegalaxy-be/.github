@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Keep Start/End dates consistent with each item's Iteration.
+"""Keep Start/Target dates consistent with each item's Iteration.
 
 Runs frequently (every 30 min) so a triage change gets picked up promptly.
-For every item whose Iteration is set but whose End date doesn't match that
+For every item whose Iteration is set but whose Target date doesn't match that
 iteration's actual end:
   - Start date already set  -> preserve it, only move End to the new
     iteration's end. This is the "was in flight, rolled into a later
@@ -30,7 +30,7 @@ query {
     projectV2(number: __PROJECT_NUMBER__) {
       id
       startField: field(name: "Start date") { ... on ProjectV2FieldCommon { id } }
-      endField: field(name: "End date") { ... on ProjectV2FieldCommon { id } }
+      endField: field(name: "Target date") { ... on ProjectV2FieldCommon { id } }
       items(first: 100__AFTER__) {
         pageInfo { hasNextPage endCursor }
         nodes {
@@ -38,7 +38,7 @@ query {
           content { ... on Issue { url labels(first: 20) { nodes { name } } } }
           iteration: fieldValueByName(name: "Iteration") { ... on ProjectV2ItemFieldIterationValue { title startDate duration } }
           startDate: fieldValueByName(name: "Start date") { ... on ProjectV2ItemFieldDateValue { date } }
-          endDate: fieldValueByName(name: "End date") { ... on ProjectV2ItemFieldDateValue { date } }
+          endDate: fieldValueByName(name: "Target date") { ... on ProjectV2ItemFieldDateValue { date } }
         }
       }
     }
