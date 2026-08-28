@@ -4,7 +4,9 @@ This describes how we track and plan work across usegalaxy-be repositories. It a
 
 ## Where work is tracked
 
-All issues and PRs across the tracked repos (infrastructure-playbook, usegalaxy-be-tools, galaxytools, usegalaxy-be-doc, usegalaxy-be.github.io, infrastructure, pulsar-deployment, metrics_internal) flow into two project boards:
+All issues and PRs across the tracked repos (infrastructure-playbook, usegalaxy-be-tools, galaxytools, usegalaxy-be-doc, usegalaxy-be.github.io, infrastructure, pulsar-deployment, metrics_internal, issues) flow into two project boards:
+
+`issues` is private and holds OKR-linked work with no ansible/infra component (outreach, admin, comms) - kept out of infrastructure-playbook on purpose, see the Pillar/Objective section below.
 
 - **UseGalaxy.be Infrastructure** (execution board): day-to-day and cycle-level tracking of individual issues and PRs.
 - **Compute Team Roadmap** (strategic board): pillars, objectives, and epics (quarterly).
