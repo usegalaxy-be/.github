@@ -1,0 +1,33 @@
+name: Task / Bug / Feature
+description: General work item. If you already know this is a multi-part initiative, use the Epic template instead.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filling this in: can you state "done" in one sentence? If not, this is probably several issues - consider splitting now rather than at triage. See CONTRIBUTING.md for the full reasoning.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What needs to happen
+      description: What's the problem, or what's being requested?
+    validations:
+      required: true
+
+  - type: textarea
+    id: done
+    attributes:
+      label: Done means
+      description: One sentence. If it takes more than one, consider splitting into multiple issues or an Epic instead.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: fit-check
+    attributes:
+      label: Iteration-fit check (optional, helps triage - see CONTRIBUTING.md)
+      options:
+        - label: Doesn't depend on someone outside the team acting first
+        - label: This is "do X", not "investigate X" (if it's investigation, done = a decision, not a fix)
+        - label: No unusual deploy/verification wait expected
+        - label: Something like this has been done before, or the scope is otherwise well understood

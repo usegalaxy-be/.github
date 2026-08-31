@@ -1,0 +1,32 @@
+name: Epic
+description: A multi-part initiative that will be broken into sub-issues.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        After creating this, set its **Issue Type to Epic** (top right of the issue). Epics don't get a Size or an Iteration - each sub-issue is sized and scheduled on its own. Use real sub-issues for the breakdown, not a checklist in the body.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What is this initiative
+    validations:
+      required: true
+
+  - type: dropdown
+    id: goal-linked
+    attributes:
+      label: Does this serve a 2026 goals.md Objective?
+      description: If yes, tag Pillar/Objective on the project board and add the OKR label + [OKR] title prefix. If no, it'll get tagged Reactive/not goal-linked at triage - that's expected, not a problem.
+      options:
+        - "Yes - tied to a specific Objective"
+        - "No - not goal-linked"
+        - "Not sure yet - decide at triage"
+    validations:
+      required: true
+
+  - type: textarea
+    id: subissues
+    attributes:
+      label: Known sub-parts (optional)
+      description: If you already know the pieces, list them here as a starting point - then add them as real sub-issues after creating this, not as a checklist.
