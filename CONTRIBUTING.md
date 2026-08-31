@@ -43,6 +43,7 @@ Things that predict a poor fit, worth checking before committing an item to an i
 - Can't describe "done" in one sentence (usually several issues bundled into one)
 - Depends on someone outside the team acting first (VSC, Data Center, VIB, upstream) - their schedule bounds the timeline regardless of how small the actual work is
 - It's "investigate/figure out X" rather than "do X" - split the investigation (done = a decision) from the fix (sized separately once scope is known), don't estimate both together
+- Requires an RFC - same pattern as investigation, just heavier: split "write it and get it approved" (done = approved) from "implement the approved change" (sized once the RFC locks in scope/approach), don't estimate both as one item. The approval stage alone rarely fits one iteration on its own - writing takes at least half a day (more if it's a new type of RFC), then there's review turnaround (an external-dependency wait, same as above, just with internal reviewers), then revision, before scheduling can even happen. Risk level shapes how much of that time is realistic to expect.
 - Real elapsed calendar time is involved beyond the work itself (deploy windows, a verification period, external review)
 - No precedent - if nobody's done something like this before, lean toward a smaller time-box and reassess partway rather than a confident big estimate
 
