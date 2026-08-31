@@ -117,4 +117,4 @@ Manual, by design:
 - Setting/revisiting an Epic's Start/Target dates, and setting End once it's genuinely done
 - Closing an issue once its deploy is verified (for anything not using `Closes #123`)
 
-See [docs/references.md](docs/references.md) for the non-GitHub-specific methodology this is based on.
+See [docs/references.md](docs/references.md) for the non-GitHub-specific methodology this is based on. New issues use the org-wide **Task/Bug/Feature** or **Epic** templates by default (`.github/ISSUE_TEMPLATE/`), which bake in the iteration-fit checklist and Epic conventions above.
