@@ -51,7 +51,7 @@ When still unsure, undersize rather than oversize - there's already a graceful p
 
 **Iteration**: 2-week cycles, Monday to Sunday. Represents "what cycle is this planned for," not a deadline. Only items actively planned for the current or next cycle should have one set.
 
-**Pillar / Objective**: which 2026 goal (from the goals document) this work serves, if any. Three states matter, and the difference between the first two is deliberate:
+**Pillar / Objective**: which 2026 goal this work serves, if any - see the Objective field's option descriptions on the project board for the full Key Result text. Three states matter, and the difference between the first two is deliberate:
 - *Blank* = not yet triaged
 - *Reactive / not goal-linked* = triaged, confirmed this doesn't serve a stated objective - covers both spontaneous break-fix work and deliberately planned work (e.g. a scheduled upgrade) that just isn't tied to a 2026 goal. Both are expected, not a problem; this tag is about goal-linkage, not about whether the work was planned or matters.
 - *A pillar set* = triaged, goal-linked

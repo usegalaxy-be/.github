@@ -18,7 +18,7 @@ body:
   - type: dropdown
     id: goal-linked
     attributes:
-      label: Does this serve a 2026 goals.md Objective?
+      label: Does this serve a 2026 Objective?
       description: If yes, tag Pillar/Objective on the project board and add the OKR label + [OKR] title prefix. If no, it'll get tagged Reactive/not goal-linked at triage - that's expected, not a problem.
       options:
         - "Yes - tied to a specific Objective"
