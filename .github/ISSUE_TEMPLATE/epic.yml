@@ -1,10 +1,11 @@
 name: Epic
 description: A multi-part initiative that will be broken into sub-issues.
+type: Epic
 body:
   - type: markdown
     attributes:
       value: |
-        After creating this, set its **Issue Type to Epic** (top right of the issue). Epics don't get a Size or an Iteration - each sub-issue is sized and scheduled on its own. Use real sub-issues for the breakdown, not a checklist in the body.
+        Issue Type is set to **Epic** automatically by this template. Epics don't get a Size or an Iteration - each sub-issue is sized and scheduled on its own. Use real sub-issues for the breakdown, not a checklist in the body.
 
   - type: textarea
     id: description
