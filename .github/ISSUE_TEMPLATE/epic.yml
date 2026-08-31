@@ -1,6 +1,7 @@
 name: Epic
 description: A multi-part initiative that will be broken into sub-issues.
 type: Epic
+projects: ["usegalaxy-be/8"]
 body:
   - type: markdown
     attributes:

@@ -25,7 +25,7 @@ To activate:
 
 1. Create a token with `project` (read/write) and `repo` scope. A fine-grained PAT from a bot/service account is preferable to a personal PAT, since this token will act as whichever account owns it (comments, status changes) - a GitHub App would be the more correct long-term answer, but a PAT is the quicker path to start.
 2. Add it as an **organization secret** named `PROJECTS_TOKEN`, scoped to this repo and the 9 tracked repos (org Settings -> Secrets and variables -> Actions).
-3. Add an **organization variable** named `PROJECT_NUMBER` set to the number of the live execution board (org Settings -> Secrets and variables -> Actions -> Variables tab).
+3. Add an **organization variable** named `PROJECT_NUMBER` set to the number of the live execution board (org Settings -> Secrets and variables -> Actions -> Variables tab). Also update `projects: ["usegalaxy-be/8"]` in both issue templates (`.github/ISSUE_TEMPLATE/*.yml`) to match - currently hardcoded to `#8` until the `#8`/`#12` migration decision is made.
 4. Add the caller workflow (`templates/label-status-sync-caller.yml` in this repo) to each of the 9 tracked repos' `.github/workflows/` directory - already done as part of this rollout, nothing further needed unless a new repo joins the tracked set later.
 5. Trigger `scheduled-nudges.yml` manually once via **Run workflow** (with `dry_run: true` first) to confirm it can reach the project before waiting for the next Monday cron.
 

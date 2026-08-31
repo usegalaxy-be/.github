@@ -1,5 +1,6 @@
 name: Task / Bug / Feature
 description: General work item. If you already know this is a multi-part initiative, use the Epic template instead.
+projects: ["usegalaxy-be/8"]
 body:
   - type: markdown
     attributes:
