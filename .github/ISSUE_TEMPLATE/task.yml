@@ -23,6 +23,18 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: rfc
+    attributes:
+      label: Does this need an RFC?
+      description: If yes, treat "write it and get it approved" as its own item (done = approved), separate from implementing the approved change - see CONTRIBUTING.md. Approval alone (writing, review turnaround, revision) rarely fits one iteration by itself.
+      options:
+        - "No"
+        - "Yes"
+        - "Not sure yet - decide at triage"
+    validations:
+      required: true
+
   - type: checkboxes
     id: fit-check
     attributes:

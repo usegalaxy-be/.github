@@ -27,6 +27,18 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: rfc
+    attributes:
+      label: Will any sub-part need an RFC?
+      description: If yes, that sub-part should be its own sub-issue with done = approved, separate from implementing the approved change - see CONTRIBUTING.md.
+      options:
+        - "No"
+        - "Yes"
+        - "Not sure yet - decide at triage"
+    validations:
+      required: true
+
   - type: textarea
     id: subissues
     attributes:
