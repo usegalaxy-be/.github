@@ -106,7 +106,7 @@ Automated (see the workflows in this repo, and the board's own Settings > Workfl
 - A `blocked` label mirrors to Status=Blocked (and clears when the label is removed)
 - Items still open when their iteration ends are moved back to Backlog with Iteration cleared (Start/Target handled per the rules above), with a comment explaining what happened
 - Start/Target dates are kept in sync with Iteration whenever it changes
-- Pillar/Objective (plus the OKR label + title prefix) are copied down from a parent issue to its sub-issues, as long as the sub-issue's own Pillar is still blank - never overwrites a value already set. Polls every 30 min rather than reacting instantly (`sub_issues` is a webhook event, not a valid Actions trigger) - only as accurate as the underlying parent/child links, worth spot-checking those
+- Pillar/Objective are copied down from a parent issue to its sub-issues, as long as the sub-issue's own Pillar is still blank - never overwrites a value already set. The OKR label and `[OKR]` title prefix are **not** propagated - those mark the top-level Objective-linked issue only, not every sub-issue under it. Polls every 30 min rather than reacting instantly (`sub_issues` is a webhook event, not a valid Actions trigger) - only as accurate as the underlying parent/child links, worth spot-checking those
 - Items entering In Progress with no Size set get a nudge comment
 - Epic-typed issues with no sub-issues after some time get a nudge comment
 

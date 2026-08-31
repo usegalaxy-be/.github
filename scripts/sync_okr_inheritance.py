@@ -7,9 +7,12 @@ not a valid GitHub Actions trigger, so this has to poll instead of react.
 
 For every item with a parent issue: if the parent's Pillar is a real value
 (not blank, not "Reactive / not goal-linked") and the item's own Pillar is
-blank, copy Pillar + Objective down from the parent, and add the OKR label
-+ [OKR] title prefix to match the usual convention. Never overwrites a
+blank, copy Pillar + Objective down from the parent. Never overwrites a
 Pillar/Objective a human already set on the item itself.
+
+The OKR label and [OKR] title prefix are NOT propagated - those mark the
+top-level Objective-linked issue only, not its sub-issues. Only the
+Pillar/Objective field values (used for reporting/rollup) inherit down.
 
 Sub-sub-issues cascade naturally over a couple of poll cycles rather than
 needing recursive graph-walking in one pass: a grandchild inherits once its
@@ -41,9 +44,8 @@ query {
           id
           content {
             ... on Issue {
-              id url title
+              id url
               parent { id }
-              labels(first: 20) { nodes { name } }
             }
           }
           pillar: fieldValueByName(name: "Pillar") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
@@ -113,20 +115,6 @@ def set_select(project_id, item_id, field_id, option_id):
     graphql(m)
 
 
-def add_label(issue_url, label):
-    if DRY_RUN:
-        print(f"[dry-run] would add label '{label}' to {issue_url}")
-        return
-    run(["gh", "issue", "edit", issue_url, "--add-label", label])
-
-
-def set_title(issue_url, title):
-    if DRY_RUN:
-        print(f"[dry-run] would retitle {issue_url} to: {title}")
-        return
-    run(["gh", "issue", "edit", issue_url, "--title", title])
-
-
 def main():
     if not os.environ.get("GH_TOKEN"):
         print("GH_TOKEN not set, skipping (automation not yet activated)")
@@ -175,12 +163,6 @@ def main():
         if parent_objective and parent_objective in project["objective_options"]:
             set_select(project["id"], item["id"], project["objective_field_id"],
                        project["objective_options"][parent_objective])
-
-        labels = {n["name"] for n in (content.get("labels") or {}).get("nodes", [])}
-        if "OKR" not in labels:
-            add_label(url, "OKR")
-        if not content["title"].startswith("[OKR]"):
-            set_title(url, f"[OKR] {content['title']}")
 
         print(f"{url}: inherited pillar={parent_pillar} objective={parent_objective}")
 
