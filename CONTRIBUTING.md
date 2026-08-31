@@ -39,6 +39,15 @@ Unlike Size and Iteration, Priority applies to Epics too - it's about relative i
 
 **Size**: XS-XL. Set when an item is triaged into an iteration, not before. A single (non-Epic) issue should be scoped to fit inside **one** iteration (2 weeks) - not planned across two from the start. If it can't realistically finish in one iteration, that's the signal to convert it to an Epic and split it into sub-issues, not to plan on rolling it into a second cycle. Rolling over is for the exceptional case where something unexpectedly slips, not a normal planning outcome - see the Start/Target date note below.
 
+Things that predict a poor fit, worth checking before committing an item to an iteration:
+- Can't describe "done" in one sentence (usually several issues bundled into one)
+- Depends on someone outside the team acting first (VSC, Data Center, VIB, upstream) - their schedule bounds the timeline regardless of how small the actual work is
+- It's "investigate/figure out X" rather than "do X" - split the investigation (done = a decision) from the fix (sized separately once scope is known), don't estimate both together
+- Real elapsed calendar time is involved beyond the work itself (deploy windows, a verification period, external review)
+- No precedent - if nobody's done something like this before, lean toward a smaller time-box and reassess partway rather than a confident big estimate
+
+When still unsure, undersize rather than oversize - there's already a graceful path for a wrong guess (mid-iteration Epic conversion, or the automatic Backlog bounce-back). A reasonable guess plus a working recovery path beats a perfect estimate upfront.
+
 **Iteration**: 2-week cycles, Monday to Sunday. Represents "what cycle is this planned for," not a deadline. Only items actively planned for the current or next cycle should have one set.
 
 **Pillar / Objective**: which 2026 goal (from the goals document) this work serves, if any. Three states matter, and the difference between the first two is deliberate:
