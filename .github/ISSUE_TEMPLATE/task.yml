@@ -40,7 +40,7 @@ body:
     attributes:
       label: Iteration-fit check (optional, helps triage - see CONTRIBUTING.md)
       options:
-        - label: Doesn't depend on someone outside the team acting first
+        - label: Depends on someone outside the team (data center, VSC, ...)
         - label: This is "do X", not "investigate X" (if it's investigation, done = a decision, not a fix)
         - label: No unusual deploy/verification wait expected
         - label: Something like this has been done before, or the scope is otherwise well understood
