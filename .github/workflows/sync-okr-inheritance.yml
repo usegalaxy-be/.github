@@ -13,16 +13,18 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      HAS_TOKEN: ${{ secrets.PROJECTS_TOKEN != '' }}
     steps:
       - name: Skip if not activated
-        if: ${{ secrets.PROJECTS_TOKEN == '' }}
+        if: ${{ env.HAS_TOKEN != 'true' }}
         run: echo "PROJECTS_TOKEN not set, skipping (automation not yet activated)."
 
       - uses: actions/checkout@v4
-        if: ${{ secrets.PROJECTS_TOKEN != '' }}
+        if: ${{ env.HAS_TOKEN == 'true' }}
 
       - name: Sync OKR inheritance
-        if: ${{ secrets.PROJECTS_TOKEN != '' }}
+        if: ${{ env.HAS_TOKEN == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           ORG: usegalaxy-be
