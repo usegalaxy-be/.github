@@ -7,9 +7,12 @@ sub_issues is a real webhook event (parent_issue_added/removed) but it is
 not a valid GitHub Actions trigger, so this has to poll instead of react.
 
 For every item with a parent issue: if the parent's Objective is a real
-value (not blank, not "Reactive / not goal-linked") and the item's own
-Objective is blank, copy Objective down from the parent. Never overwrites
-an Objective a human already set on the item itself.
+value (not blank, not "Not objective-linked"), the child's Objective
+is kept in sync with it - overwriting a stale or mismatched value, not
+just filling blanks. The one thing this never overrides is a child
+explicitly marked "Not objective-linked" - that's the one available
+way for a human to exempt a specific sub-issue from its parent's
+goal-linkage, so it has to stay sticky or there'd be no way to opt out.
 
 The OKR label and [OKR] title prefix are NOT propagated - those mark the
 top-level Objective-linked issue only, not its sub-issues. Only the
@@ -36,7 +39,7 @@ ORG = os.environ.get("ORG", "usegalaxy-be")
 PROJECT_NUMBER = os.environ.get("PROJECT_NUMBER")
 DRY_RUN = os.environ.get("DRY_RUN") == "true"
 
-REACTIVE_OPTION_NAME = "Reactive / not goal-linked"
+NOT_LINKED_OPTION_NAME = "Not objective-linked"
 MAX_PASSES = 20  # generous headroom for any realistic sub-issue chain depth
 
 QUERY_TEMPLATE = '''
@@ -153,8 +156,10 @@ def main():
             content = item.get("content")
             if not content:
                 continue
-            if current_objective.get(item["id"]):
-                continue  # already set, by a human or an earlier pass - never overwrite
+
+            own_objective = current_objective.get(item["id"])
+            if own_objective == NOT_LINKED_OPTION_NAME:
+                continue  # explicit human opt-out - the one value inheritance never overrides
 
             parent_ref = content.get("parent")
             if not parent_ref:
@@ -165,16 +170,20 @@ def main():
                 continue  # parent isn't on this project (yet)
 
             parent_objective = current_objective.get(parent_item["id"])
-            if not parent_objective or parent_objective == REACTIVE_OPTION_NAME:
+            if not parent_objective or parent_objective == NOT_LINKED_OPTION_NAME:
                 continue  # parent isn't OKR-linked (yet, this pass), nothing to inherit
 
             if parent_objective not in project["objective_options"]:
                 continue
 
+            if own_objective == parent_objective:
+                continue  # already correct, nothing to do
+
             current_objective[item["id"]] = parent_objective
             set_select(project["id"], item["id"], project["objective_field_id"],
                        project["objective_options"][parent_objective])
-            print(f"{content['url']}: inherited objective={parent_objective}")
+            verb = "inherited" if not own_objective else f"corrected from {own_objective!r} to"
+            print(f"{content['url']}: {verb} objective={parent_objective}")
             changed = True
 
         if not changed:

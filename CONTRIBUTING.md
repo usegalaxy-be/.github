@@ -53,7 +53,7 @@ When still unsure, call the effort lower rather than higher - there's already a 
 
 **Objective**: which 2026 goal this work serves, if any - see the field's option descriptions on the project board for the full Key Result text under each Objective. Three states matter, and the difference between the first two is deliberate:
 - *Blank* = not yet triaged
-- *Reactive / not goal-linked* = triaged, confirmed this doesn't serve a stated objective - covers both spontaneous break-fix work and deliberately planned work (e.g. a scheduled upgrade) that just isn't tied to a 2026 goal. Both are expected, not a problem; this tag is about goal-linkage, not about whether the work was planned or matters.
+- *Not objective-linked* = triaged, confirmed this doesn't serve a stated objective - covers both spontaneous break-fix work and deliberately planned work (e.g. a scheduled upgrade) that just isn't tied to a 2026 goal. Both are expected, not a problem; this tag is about goal-linkage, not about whether the work was planned or matters.
 - *An Objective set* = triaged, goal-linked
 
 Objective is the only field this board uses for goal-linkage - the coarser Pillar grouping isn't tracked separately here, an Objective's own numbering (`O1.x`, `O2.x`, ...) already identifies which Pillar it belongs to.
@@ -79,12 +79,12 @@ Use the existing weekly Monday meeting when a new iteration starts (every other 
 **Iteration-boundary Monday** (full triage): covers two iterations - the one starting now (finalized, real commitment) and the one after that (light preview only, see below). The second one matters less; don't spend equal effort on it.
 1. Review the **Needs Re-triage** view (items the automation bounced back to Backlog) - still the priority? Pull into the iteration starting now. Not right now? Leave in Backlog. Turned out bigger than expected? Split into an Epic instead of re-entering it as-is.
 2. Finalize the iteration that's starting: items staged as "next up" at the last triage are a non-binding preview, not a commitment - re-review each one now that it's real (given current capacity and priorities), don't rubber-stamp. This is issue-level and one iteration ahead only; picking which Objectives matter this quarter is a separate, coarser decision made at quarterly planning, not here.
-3. Triage new Backlog items: the board's **Triage** view (Status=Backlog, Objective=blank, sorted oldest-first). For each, either set an Objective and Priority, or mark it Reactive/not goal-linked. Pull top-priority items into the now-current iteration up to the In Progress column's limit (a soft cap, see column settings); stage a few likely candidates into "next" for visibility, to be properly reviewed at the following iteration boundary.
+3. Triage new Backlog items: the board's **Triage** view (Status=Backlog, Objective=blank, sorted oldest-first). For each, either set an Objective and Priority, or mark it Not objective-linked. Pull top-priority items into the now-current iteration up to the In Progress column's limit (a soft cap, see column settings); stage a few likely candidates into "next" for visibility, to be properly reviewed at the following iteration boundary.
 4. Epic check-in: anything the "no sub-issues after 2 weeks" nudge has flagged, or any Epic close to fully rolled up. Also check the **Active OKRs** view - it has its own WIP limit (separate from the execution board's) on how many Epics can be Status=In Progress at once. Blocked Epics free a slot; pull in the next-highest-priority in-focus Epic from Backlog, don't just start more on top. The point is to actually finish Epics rather than spread thin across many at once.
 
 **Mid-iteration Monday** (business as usual): triage any new issues into Backlog (Objective/Priority). Nothing for the running iteration.
 
-Only genuinely urgent work (something's broken or blocking users right now) skips triage and moves straight from Backlog to In Progress. Everything else goes through iteration planning, whether or not it's goal-linked - a deliberately scheduled upgrade or migration is triaged, sized, and scheduled into a cycle the same as goal-linked work, even though it'll end up tagged Reactive/not goal-linked. That tag means "doesn't serve a stated objective," not "wasn't planned" or "isn't important."
+Only genuinely urgent work (something's broken or blocking users right now) skips triage and moves straight from Backlog to In Progress. Everything else goes through iteration planning, whether or not it's goal-linked - a deliberately scheduled upgrade or migration is triaged, sized, and scheduled into a cycle the same as goal-linked work, even though it'll end up tagged Not objective-linked. That tag means "doesn't serve a stated objective," not "wasn't planned" or "isn't important."
 
 There's a third type of work besides "urgent, skips the queue" and "goal-linked": small, cheap, non-urgent, non-goal-linked work (a stale doc update, ...) that will *always* be low priority compared to anything else and would otherwise sit in Backlog forever. Rather than forcing these through Effort/Iteration scheduling they have no real timing need, mark them with the `opportunistic` label: picked up whenever someone has spare capacity, with no formal commitment to when and no Iteration assigned at all. If something's sat untouched for a long time even as "opportunistic" and nobody's ever picked it up, that could be a sign to close it rather than keeping it. The room for this comes from how the item limit in an iteration. Keep iteration planning deliberately below the team's full theoretical capacity.
 
@@ -116,14 +116,14 @@ Automated (see the workflows in this repo, and the board's own Settings > Workfl
 - A `blocked` label mirrors to Status=Blocked (and clears when the label is removed)
 - Items still open when their iteration ends are moved back to Backlog with Iteration cleared (Start/Target handled per the rules above), with a comment explaining what happened
 - Start/Target dates are kept in sync with Iteration whenever it changes
-- Objective is copied down from a parent issue to its sub-issues, and recursively on down to sub-sub-issues and beyond in the same run - never overwrites a value already set. The OKR label and `[OKR]` title prefix are **not** propagated - those mark the top-level Objective-linked issue only, not every sub-issue under it. Polls every 30 min rather than reacting instantly (`sub_issues` is a webhook event, not a valid Actions trigger) - only as accurate as the underlying parent/child links, worth spot-checking those
+- Objective is kept in sync from a parent issue down to its sub-issues, and recursively on down to sub-sub-issues and beyond in the same run - the parent is authoritative, so this overwrites a stale or mismatched Objective, not just blanks. Mark an item `Not objective-linked` if it should genuinely be exempt from its parent's goal-linkage, that's the one value inheritance never overrides. The OKR label and `[OKR]` title prefix are **not** propagated - those mark the top-level Objective-linked issue only, not every sub-issue under it. Polls every 30 min rather than reacting instantly (`sub_issues` is a webhook event, not a valid Actions trigger) - only as accurate as the underlying parent/child links, worth spot-checking those. Scheduled runs aren't fully reliable (GitHub can silently drop a queued cron run under load), worth a manual trigger if something looks stale
 - Items entering In Progress with no Effort set get a nudge comment
 - Epic-typed issues with no sub-issues after some time get a nudge comment
 
 Manual, by design:
 - Setting Priority above the High/Medium defaults
 - Setting Objective
-- Deciding an item is Reactive rather than just untriaged
+- Deciding an item is Not objective-linked rather than just untriaged
 - Deciding whether an item bumped back to Backlog is still the priority (re-enter it) or not (leave it)
 - Deciding a stuck item should become an Epic instead of being re-entered as-is
 - Setting/revisiting an Epic's Start/Target dates, and setting End once it's genuinely done
