@@ -20,6 +20,11 @@ changes (bounded by MAX_PASSES), so a whole parent -> child -> grandchild
 -> ... chain resolves within a single run instead of needing several poll
 cycles to cascade one level at a time.
 
+Includes archived items (archivedStates: [ARCHIVED, NOT_ARCHIVED]) - the
+default is active-only, but Objective is a permanent record of what an
+item served, not something that should stop propagating just because the
+item was later closed and auto-archived off the board.
+
 Requires GH_TOKEN, ORG, PROJECT_NUMBER. No-ops cleanly if GH_TOKEN is unset.
 """
 import json
@@ -40,7 +45,7 @@ query {
     projectV2(number: __PROJECT_NUMBER__) {
       id
       objectiveField: field(name: "Objective") { ... on ProjectV2SingleSelectField { id options { id name } } }
-      items(first: 100__AFTER__) {
+      items(first: 100__AFTER__, archivedStates: [ARCHIVED, NOT_ARCHIVED]) {
         pageInfo { hasNextPage endCursor }
         nodes {
           id
