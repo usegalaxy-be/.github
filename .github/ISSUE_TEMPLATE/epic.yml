@@ -24,6 +24,7 @@ body:
         - "Yes - tied to a specific Objective"
         - "No - not goal-linked"
         - "Not sure yet - decide at triage"
+      default: 2
     validations:
       required: true
 
@@ -36,8 +37,20 @@ body:
         - "No"
         - "Yes"
         - "Not sure yet - decide at triage"
+      default: 2
     validations:
       required: true
+
+  - type: checkboxes
+    id: why-epic
+    attributes:
+      label: Why does this need to be an Epic?
+      description: If none of these actually apply, this might fit in one iteration as a regular Task instead - see CONTRIBUTING.md's iteration-fit guidance.
+      options:
+        - label: Depends on someone outside the team acting first (data center, VSC, ...), their schedule bounds the timeline regardless of how small the work is
+        - label: At least one part is "investigate/figure out X" rather than "do X" - the investigation (done = a decision) and the eventual fix are separately scoped
+        - label: Real elapsed calendar time is involved beyond the work itself (deploy windows, a verification period, external review)
+        - label: No precedent - nobody's done something like this before, so a single confident estimate isn't realistic
 
   - type: textarea
     id: subissues

@@ -32,15 +32,6 @@ body:
         - "No"
         - "Yes"
         - "Not sure yet - decide at triage"
+      default: 0
     validations:
       required: true
-
-  - type: checkboxes
-    id: fit-check
-    attributes:
-      label: Iteration-fit check (optional, helps triage - see CONTRIBUTING.md)
-      options:
-        - label: Depends on someone outside the team (data center, VSC, ...)
-        - label: This is "do X", not "investigate X" (if it's investigation, done = a decision, not a fix)
-        - label: No unusual deploy/verification wait expected
-        - label: Something like this has been done before, or the scope is otherwise well understood
