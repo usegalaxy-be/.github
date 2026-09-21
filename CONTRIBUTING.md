@@ -60,11 +60,11 @@ Objective is the only field this board uses for goal-linkage - the coarser Pilla
 
 A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective - also add the `OKR` label and an `[OKR]` title prefix, for visibility outside the project board too.
 
-**Start date / Target date**: for regular (non-Epic) issues, automatically derived from the Iteration's window and kept in sync. Epics are the exception - see Issue types above, their Start/Target/End are set independently rather than derived. When a regular issue gets a new Iteration and already has a Start date, only Target moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and Target are set fresh to the new iteration's window.
+**Start date / Target date / End date**: all three are org-level Issue Fields (Settings > Planning > Issue Fields), not project fields - the same value is visible on the issue wherever it's tracked, not just here. `Start date`/`Target date` are pinned to show on every issue type; `End date` is pinned to `Epic` only, since it's only meaningful there.
 
-Note: the org also defines `Start date` / `Target date` Issue Fields (Settings > Planning > Issue Fields), same names, org-wide. These project-local fields are still the ones the automation actually reads and writes for now - consolidating onto the org-level fields is a known follow-up, not done yet, since the sync automation would need rework to target them instead.
+For regular (non-Epic) issues, `Start`/`Target` are automatically derived from the Iteration's window and kept in sync. Epics are the exception - see Issue types above, their Start/Target/End are set independently rather than derived. When a regular issue gets a new Iteration and already has a Start date, only Target moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and Target are set fresh to the new iteration's window.
 
-**End date**: Epic-only, manual. Not derived from anything, not touched by automation. Only set once an Epic is genuinely done - it's a record of what actually happened, not a plan.
+`End date` is manual, not derived from anything, not touched by automation. Only set once an Epic is genuinely done - it's a record of what actually happened, not a plan.
 
 ## Triage
 

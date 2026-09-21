@@ -9,9 +9,14 @@ Three checks, run weekly:
      there's nothing real to preserve. Either way, a comment explains what
      happened. See scripts/sync_iteration_dates.py for what happens to the
      dates the next time this item gets a new Iteration assigned.
-  2. Item is Status=In Progress with no Size set: nudge comment only.
+  2. Item is Status=In Progress with no Effort set: nudge comment only.
   3. Issue is Epic-typed, has no sub-issues, and is >14 days old: nudge
      comment only.
+
+Start date and Target date are org-level Issue Fields (Settings > Planning >
+Issue Fields), read/cleared via the Issue Field mutations, not the
+project-field ones - Status/Iteration/Effort stay project-local (Effort is
+also an org field, read-only here) or project fields as noted per check.
 
 Comments are de-duplicated by marker, skipped if already posted in the last
 5 days. Requires GH_TOKEN (a PAT/App token with `project` write scope) and
@@ -29,7 +34,7 @@ PROJECT_NUMBER = os.environ.get("PROJECT_NUMBER")
 DRY_RUN = os.environ.get("DRY_RUN") == "true"
 
 MARKER_ITERATION = "<!-- nudge:stale-iteration-rollover -->"
-MARKER_SIZE = "<!-- nudge:missing-size -->"
+MARKER_EFFORT = "<!-- nudge:missing-effort -->"
 MARKER_EPIC = "<!-- nudge:epic-no-subissues -->"
 
 
@@ -47,6 +52,16 @@ def graphql(query):
     return json.loads(r.stdout)
 
 
+ORG_DATE_FIELDS_QUERY = '''
+query {
+  organization(login: "__ORG__") {
+    issueFields(first: 20) {
+      nodes { __typename ... on IssueFieldDate { id name } }
+    }
+  }
+}
+'''
+
 # Plain (non-f) template: GraphQL is brace-heavy, so we substitute placeholder
 # tokens instead of using str.format()/f-strings to avoid escaping every { and }.
 PROJECT_QUERY_TEMPLATE = '''
@@ -56,31 +71,46 @@ query {
       id
       statusField: field(name: "Status") { ... on ProjectV2SingleSelectField { id options { id name } } }
       iterationField: field(name: "Iteration") { ... on ProjectV2IterationField { id } }
-      startField: field(name: "Start date") { ... on ProjectV2FieldCommon { id } }
-      endField: field(name: "Target date") { ... on ProjectV2FieldCommon { id } }
       items(first: 100__AFTER__) {
         pageInfo { hasNextPage endCursor }
         nodes {
           id
           content {
             ... on Issue {
+              id
               number url createdAt state
               repository { name }
               issueType { name }
               subIssuesSummary { total }
               labels(first: 20) { nodes { name } }
+              issueFieldValues(first: 10) {
+                nodes {
+                  ... on IssueFieldDateValue { value field { ... on IssueFieldDate { name } } }
+                  ... on IssueFieldSingleSelectValue { name field { ... on IssueFieldSingleSelect { name } } }
+                }
+              }
             }
           }
           status: fieldValueByName(name: "Status") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
-          size: fieldValueByName(name: "Size") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
           iteration: fieldValueByName(name: "Iteration") { ... on ProjectV2ItemFieldIterationValue { title startDate duration } }
-          startDate: fieldValueByName(name: "Start date") { ... on ProjectV2ItemFieldDateValue { date } }
         }
       }
     }
   }
 }
 '''
+
+
+def fetch_org_date_field_ids():
+    q = ORG_DATE_FIELDS_QUERY.replace("__ORG__", ORG)
+    data = graphql(q)
+    if not data or not data.get("data", {}).get("organization"):
+        return None
+    fields = {}
+    for node in data["data"]["organization"]["issueFields"]["nodes"]:
+        if node.get("__typename") == "IssueFieldDate":
+            fields[node["name"]] = node["id"]
+    return fields
 
 
 def fetch_project():
@@ -103,8 +133,6 @@ def fetch_project():
                 "status_field_id": project["statusField"]["id"],
                 "status_options": {o["name"]: o["id"] for o in project["statusField"]["options"]},
                 "iteration_field_id": project["iterationField"]["id"],
-                "start_field_id": project["startField"]["id"],
-                "end_field_id": project["endField"]["id"],
             }
         page = project["items"]
         items.extend(page["nodes"])
@@ -112,6 +140,16 @@ def fetch_project():
             break
         cursor = page["pageInfo"]["endCursor"]
     return project_meta, items
+
+
+def field_values_by_name(content):
+    values = {}
+    for fv in (content.get("issueFieldValues") or {}).get("nodes", []):
+        if not fv or not fv.get("field"):
+            continue
+        name = fv["field"]["name"]
+        values[name] = fv.get("value", fv.get("name"))
+    return values
 
 
 def has_recent_marker(issue_url, marker, days=5):
@@ -168,12 +206,27 @@ def clear_field(project_id, item_id, field_id):
     graphql(m)
 
 
+def clear_issue_date(issue_id, field_id):
+    if DRY_RUN:
+        print(f"[dry-run] would clear date field {field_id} on issue {issue_id}")
+        return
+    m = f'''mutation {{
+      deleteIssueFieldValue(input: {{ issueId: "{issue_id}", fieldId: "{field_id}" }}) {{ clientMutationId }}
+    }}'''
+    graphql(m)
+
+
 def main():
     if not os.environ.get("GH_TOKEN"):
         print("GH_TOKEN not set, skipping (automation not yet activated)")
         return
     if not PROJECT_NUMBER:
         print("PROJECT_NUMBER not set, skipping")
+        return
+
+    date_fields = fetch_org_date_field_ids()
+    if not date_fields or "Start date" not in date_fields or "Target date" not in date_fields:
+        print("could not load org Start date/Target date fields, skipping")
         return
 
     project, items = fetch_project()
@@ -187,14 +240,16 @@ def main():
         if not content or content.get("state") != "OPEN":
             continue
         url = content["url"]
+        issue_id = content["id"]
         status = (item.get("status") or {}).get("name")
-        size = (item.get("size") or {}).get("name")
         iteration = item.get("iteration")
         issue_type = (content.get("issueType") or {}).get("name")
         sub_total = (content.get("subIssuesSummary") or {}).get("total", 0)
         created_at = datetime.fromisoformat(content["createdAt"].replace("Z", "+00:00"))
         labels = {n["name"] for n in (content.get("labels") or {}).get("nodes", [])}
         is_opportunistic = "opportunistic" in labels
+        values = field_values_by_name(content)
+        effort = values.get("Effort")
 
         if status != "Done" and iteration:
             start = datetime.fromisoformat(iteration["startDate"]).replace(tzinfo=timezone.utc)
@@ -210,8 +265,8 @@ def main():
                             "record that real work was in flight from Start through the iteration "
                             "that just ended.")
                 else:
-                    clear_field(project["id"], item["id"], project["start_field_id"])
-                    clear_field(project["id"], item["id"], project["end_field_id"])
+                    clear_issue_date(issue_id, date_fields["Start date"])
+                    clear_issue_date(issue_id, date_fields["Target date"])
                     note = "It was never started, so Start/Target dates were cleared too."
                 comment(url, MARKER_ITERATION,
                         f"Its iteration (**{iteration['title']}**, ended {end.date()}) has passed "
@@ -220,9 +275,9 @@ def main():
                         f"If it turned out bigger than expected, split it into an Epic with "
                         f"sub-issues instead of re-entering it as-is.")
 
-        if status == "In Progress" and not size and issue_type != "Epic" and not is_opportunistic:
-            comment(url, MARKER_SIZE,
-                    "This item is In Progress with no Size set. Add one, or if it feels too big, "
+        if status == "In Progress" and not effort and issue_type != "Epic" and not is_opportunistic:
+            comment(url, MARKER_EFFORT,
+                    "This item is In Progress with no Effort set. Add one, or if it feels too big, "
                     "consider splitting it into sub-issues.")
 
         if issue_type == "Epic" and sub_total == 0 and (now - created_at) > timedelta(days=14):
