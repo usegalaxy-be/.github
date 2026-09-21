@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
-"""Propagate Pillar/Objective down from an OKR-tagged parent to its sub-issues.
+"""Propagate Objective down from an OKR-tagged parent to its sub-issues,
+recursively through sub-sub-issues and beyond.
 
 Runs frequently (every 30 min), same reasoning as sync_iteration_dates.py:
 sub_issues is a real webhook event (parent_issue_added/removed) but it is
 not a valid GitHub Actions trigger, so this has to poll instead of react.
 
-For every item with a parent issue: if the parent's Pillar is a real value
-(not blank, not "Reactive / not goal-linked") and the item's own Pillar is
-blank, copy Pillar + Objective down from the parent. Never overwrites a
-Pillar/Objective a human already set on the item itself.
+For every item with a parent issue: if the parent's Objective is a real
+value (not blank, not "Reactive / not goal-linked") and the item's own
+Objective is blank, copy Objective down from the parent. Never overwrites
+an Objective a human already set on the item itself.
 
 The OKR label and [OKR] title prefix are NOT propagated - those mark the
 top-level Objective-linked issue only, not its sub-issues. Only the
-Pillar/Objective field values (used for reporting/rollup) inherit down.
+Objective field value (used for reporting/rollup) inherits down.
 
-Sub-sub-issues cascade naturally over a couple of poll cycles rather than
-needing recursive graph-walking in one pass: a grandchild inherits once its
-immediate parent has already inherited on an earlier run.
+The propagation pass repeats in-memory until a full pass makes no further
+changes (bounded by MAX_PASSES), so a whole parent -> child -> grandchild
+-> ... chain resolves within a single run instead of needing several poll
+cycles to cascade one level at a time.
 
 Requires GH_TOKEN, ORG, PROJECT_NUMBER. No-ops cleanly if GH_TOKEN is unset.
 """
@@ -30,13 +32,13 @@ PROJECT_NUMBER = os.environ.get("PROJECT_NUMBER")
 DRY_RUN = os.environ.get("DRY_RUN") == "true"
 
 REACTIVE_OPTION_NAME = "Reactive / not goal-linked"
+MAX_PASSES = 20  # generous headroom for any realistic sub-issue chain depth
 
 QUERY_TEMPLATE = '''
 query {
   organization(login: "__ORG__") {
     projectV2(number: __PROJECT_NUMBER__) {
       id
-      pillarField: field(name: "Pillar") { ... on ProjectV2SingleSelectField { id options { id name } } }
       objectiveField: field(name: "Objective") { ... on ProjectV2SingleSelectField { id options { id name } } }
       items(first: 100__AFTER__) {
         pageInfo { hasNextPage endCursor }
@@ -48,7 +50,6 @@ query {
               parent { id }
             }
           }
-          pillar: fieldValueByName(name: "Pillar") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
           objective: fieldValueByName(name: "Objective") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
         }
       }
@@ -89,8 +90,6 @@ def fetch_project():
         if meta is None:
             meta = {
                 "id": project["id"],
-                "pillar_field_id": project["pillarField"]["id"],
-                "pillar_options": {o["name"]: o["id"] for o in project["pillarField"]["options"]},
                 "objective_field_id": project["objectiveField"]["id"],
                 "objective_options": {o["name"]: o["id"] for o in project["objectiveField"]["options"]},
             }
@@ -135,36 +134,46 @@ def main():
         if content:
             by_issue_id[content["id"]] = item
 
-    for item in items:
-        content = item.get("content")
-        if not content:
-            continue
-        parent_ref = content.get("parent")
-        if not parent_ref:
-            continue
+    # in-memory objective per item, updated as we go so a pass can see a
+    # value set earlier in the same pass (or a prior pass) as already there
+    current_objective = {
+        item["id"]: (item.get("objective") or {}).get("name")
+        for item in items
+    }
 
-        own_pillar = (item.get("pillar") or {}).get("name")
-        if own_pillar:
-            continue  # already set, by a human or a prior run - never overwrite
+    for _pass in range(MAX_PASSES):
+        changed = False
 
-        parent_item = by_issue_id.get(parent_ref["id"])
-        if not parent_item:
-            continue  # parent isn't on this project (yet)
+        for item in items:
+            content = item.get("content")
+            if not content:
+                continue
+            if current_objective.get(item["id"]):
+                continue  # already set, by a human or an earlier pass - never overwrite
 
-        parent_pillar = (parent_item.get("pillar") or {}).get("name")
-        if not parent_pillar or parent_pillar == REACTIVE_OPTION_NAME:
-            continue  # parent isn't OKR-linked, nothing to inherit
+            parent_ref = content.get("parent")
+            if not parent_ref:
+                continue
 
-        parent_objective = (parent_item.get("objective") or {}).get("name")
-        url = content["url"]
+            parent_item = by_issue_id.get(parent_ref["id"])
+            if not parent_item:
+                continue  # parent isn't on this project (yet)
 
-        set_select(project["id"], item["id"], project["pillar_field_id"],
-                   project["pillar_options"][parent_pillar])
-        if parent_objective and parent_objective in project["objective_options"]:
+            parent_objective = current_objective.get(parent_item["id"])
+            if not parent_objective or parent_objective == REACTIVE_OPTION_NAME:
+                continue  # parent isn't OKR-linked (yet, this pass), nothing to inherit
+
+            if parent_objective not in project["objective_options"]:
+                continue
+
+            current_objective[item["id"]] = parent_objective
             set_select(project["id"], item["id"], project["objective_field_id"],
                        project["objective_options"][parent_objective])
+            print(f"{content['url']}: inherited objective={parent_objective}")
+            changed = True
 
-        print(f"{url}: inherited pillar={parent_pillar} objective={parent_objective}")
+        if not changed:
+            break
 
 
 if __name__ == "__main__":

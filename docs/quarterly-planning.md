@@ -1,6 +1,6 @@
 # Picking quarterly focus
 
-The decision happens at the Epic (Key Result) level, not the Objective level. An Objective like O1.4 bundles many very different Epics - "focus on O1.4" doesn't actually say whether SSO work happens this quarter or in six months. Pillars/Objectives stay useful as tags for grouping and reporting; they aren't the unit of the decision itself.
+The decision happens at the Epic (Key Result) level, not the Objective level. An Objective like O1.4 bundles many very different Epics - "focus on O1.4" doesn't actually say whether SSO work happens this quarter or in six months. Objectives stay useful as tags for grouping and reporting; they aren't the unit of the decision itself.
 
 Most deliverable-shaped Key Results already are a single Epic 1:1 - picking KRs and picking Epics are the same exercise. A metric-only KR (e.g. "25% increase in active users") has no Epic of its own; it's what the Epics serving it are judged against.
 
@@ -20,4 +20,4 @@ Quarterly, review all open Epics across all Objectives together (not pre-filtere
 1. Whoever's deciding (not necessarily the whole team) spends 30-45 minutes going through all open Epics against the questions above, regardless of which Objective they sit under.
 2. Land on the actual in-focus set. Expect this to be selective even within an Objective that clearly matters - not every Epic under a chosen Objective makes the cut.
 3. Write the decision down.
-4. Revisit next quarter. The point isn't a permanent ranking, it's having *a* ranking that beats "everything is P1."
+4. Revisit next quarter. The point isn't a permanent ranking, it's having *a* ranking that beats "everything is High."

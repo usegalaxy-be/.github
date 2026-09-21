@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Issue Type is set to **Epic** automatically by this template. Epics don't get a Size or an Iteration - each sub-issue is sized and scheduled on its own. Use real sub-issues for the breakdown, not a checklist in the body.
+        Issue Type is set to **Epic** automatically by this template. Epics don't get an Effort or an Iteration - each sub-issue gets its own Effort and is scheduled on its own. Use real sub-issues for the breakdown, not a checklist in the body.
 
   - type: textarea
     id: description
@@ -19,7 +19,7 @@ body:
     id: goal-linked
     attributes:
       label: Does this serve a 2026 Objective?
-      description: If yes, tag Pillar/Objective on the project board and add the OKR label + [OKR] title prefix. If no, it'll get tagged Reactive/not goal-linked at triage - that's expected, not a problem.
+      description: If yes, tag the Objective on the project board and add the OKR label + [OKR] title prefix. If no, it'll get tagged Reactive/not goal-linked at triage - that's expected, not a problem.
       options:
         - "Yes - tied to a specific Objective"
         - "No - not goal-linked"

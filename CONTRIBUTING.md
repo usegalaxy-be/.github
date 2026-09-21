@@ -6,7 +6,7 @@ This describes how we track and plan work across usegalaxy-be repositories. It a
 
 All issues and PRs across the tracked repos (infrastructure-playbook, usegalaxy-be-tools, galaxytools, usegalaxy-be-doc, usegalaxy-be.github.io, infrastructure, pulsar-deployment, metrics_internal, issues) flow into two project boards:
 
-`issues` is private and holds OKR-linked work with no ansible/infra component (outreach, admin, comms) - kept out of infrastructure-playbook on purpose, see the Pillar/Objective section below.
+`issues` is private and holds OKR-linked work with no ansible/infra component (outreach, admin, comms) - kept out of infrastructure-playbook on purpose, see the Objective section below.
 
 - **UseGalaxy.be Infrastructure** (execution board): day-to-day and cycle-level tracking of individual issues and PRs.
 - **Compute Team Roadmap** (strategic board): pillars, objectives, and epics (quarterly).
@@ -20,9 +20,9 @@ Most contributors only need the execution board. The roadmap board is for planni
 - **Task** - routine, scoped work
 - **Epic** - a multi-part initiative, broken into sub-issues (use GitHub's native sub-issues, not a checklist inside the issue body)
 
-If an issue is accumulating a checklist of more than 2-3 sub-parts inside its own body, that's a sign it should be an Epic with real sub-issues instead. Sub-issues get their own Status/Priority/Size; the parent Epic shows a automatic completion status.
+If an issue is accumulating a checklist of more than 2-3 sub-parts inside its own body, that's a sign it should be an Epic with real sub-issues instead. Sub-issues get their own Status/Priority/Effort; the parent Epic shows a automatic completion status.
 
-Epics don't get a Size or an Iteration of their own. Each sub-issue is sized and scheduled individually.
+Epics don't get an Effort or an Iteration of their own. Each sub-issue gets its own Effort and is scheduled individually.
 
 Epics *do* get their own Start/Target/End dates - Target and End are different things and both matter: Target is the estimate (a projection, revisable as things change), End is filled in only once the Epic is actually done, recording what really happened. The gap between the two is useful information on its own (how far off was the estimate), not just planning noise.
 
@@ -33,11 +33,11 @@ Some Epics don't need a Target date set. We only set a real one when there's an 
 
 **Status**: Backlog / In Progress / Blocked / Done. Kept deliberately small so it can be driven by automation (see below).
 
-**Priority**: P0 / P1 / P2. P0 is reserved for genuine escalations - never set automatically. As a starting default: goal-linked work (has a Pillar) defaults to P1, reactive work defaults to P2. Adjust as needed during triage.
+**Priority**: Urgent / High / Medium / Low. This is an org-level Issue Field (Settings > Planning > Issue Fields), not specific to this board - the same value is visible on the issue wherever it's tracked, not just here. Urgent is reserved for genuine escalations - never set automatically. As a starting default: goal-linked work (has an Objective) defaults to High, reactive work defaults to Medium. Low is a manual downgrade for things that matter even less than the reactive default, nothing defaults to it. Adjust as needed during triage.
 
-Unlike Size and Iteration, Priority applies to Epics too - it's about relative importance, not execution scheduling, so it isn't tied to fitting in one cycle. An Epic's Priority is what should drive which initiatives get staffed; a sub-issue's Priority is more about ordering work within an Epic that's already been deemed worth doing.
+Unlike Effort and Iteration, Priority applies to Epics too - it's about relative importance, not execution scheduling, so it isn't tied to fitting in one cycle. An Epic's Priority is what should drive which initiatives get staffed; a sub-issue's Priority is more about ordering work within an Epic that's already been deemed worth doing.
 
-**Size**: XS-XL. Set when an item is triaged into an iteration, not before. A single (non-Epic) issue should be scoped to fit inside **one** iteration (2 weeks) - not planned across two from the start. If it can't realistically finish in one iteration, that's the signal to convert it to an Epic and split it into sub-issues, not to plan on rolling it into a second cycle. Rolling over is for the exceptional case where something unexpectedly slips, not a normal planning outcome - see the Start/Target date note below.
+**Effort**: High / Medium / Low. Also an org-level Issue Field, same as Priority. Set when an item is triaged into an iteration, not before. A single (non-Epic) issue should be scoped to fit inside **one** iteration (2 weeks) - not planned across two from the start. `High` effort is the signal it doesn't fit: convert it to an Epic and split it into sub-issues, not plan on rolling it into a second cycle. Rolling over is for the exceptional case where something unexpectedly slips, not a normal planning outcome - see the Start/Target date note below.
 
 Things that predict a poor fit, worth checking before committing an item to an iteration:
 - Can't describe "done" in one sentence (usually several issues bundled into one)
@@ -47,18 +47,22 @@ Things that predict a poor fit, worth checking before committing an item to an i
 - Real elapsed calendar time is involved beyond the work itself (deploy windows, a verification period, external review)
 - No precedent - if nobody's done something like this before, lean toward a smaller time-box and reassess partway rather than a confident big estimate
 
-When still unsure, undersize rather than oversize - there's already a graceful path for a wrong guess (mid-iteration Epic conversion, or the automatic Backlog bounce-back). A reasonable guess plus a working recovery path beats a perfect estimate upfront.
+When still unsure, call the effort lower rather than higher - there's already a graceful path for a wrong guess (mid-iteration Epic conversion, or the automatic Backlog bounce-back). A reasonable guess plus a working recovery path beats a perfect estimate upfront.
 
 **Iteration**: 2-week cycles, Monday to Sunday. Represents "what cycle is this planned for," not a deadline. Only items actively planned for the current or next cycle should have one set.
 
-**Pillar / Objective**: which 2026 goal this work serves, if any - see the Objective field's option descriptions on the project board for the full Key Result text. Three states matter, and the difference between the first two is deliberate:
+**Objective**: which 2026 goal this work serves, if any - see the field's option descriptions on the project board for the full Key Result text under each Objective. Three states matter, and the difference between the first two is deliberate:
 - *Blank* = not yet triaged
 - *Reactive / not goal-linked* = triaged, confirmed this doesn't serve a stated objective - covers both spontaneous break-fix work and deliberately planned work (e.g. a scheduled upgrade) that just isn't tied to a 2026 goal. Both are expected, not a problem; this tag is about goal-linkage, not about whether the work was planned or matters.
-- *A pillar set* = triaged, goal-linked
+- *An Objective set* = triaged, goal-linked
 
-Objective options in the field picker show the Key Results under it. A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective - also add the `OKR` label and an `[OKR]` title prefix, for visibility outside the project board too.
+Objective is the only field this board uses for goal-linkage - the coarser Pillar grouping isn't tracked separately here, an Objective's own numbering (`O1.x`, `O2.x`, ...) already identifies which Pillar it belongs to.
+
+A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective - also add the `OKR` label and an `[OKR]` title prefix, for visibility outside the project board too.
 
 **Start date / Target date**: for regular (non-Epic) issues, automatically derived from the Iteration's window and kept in sync. Epics are the exception - see Issue types above, their Start/Target/End are set independently rather than derived. When a regular issue gets a new Iteration and already has a Start date, only Target moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and Target are set fresh to the new iteration's window.
+
+Note: the org also defines `Start date` / `Target date` Issue Fields (Settings > Planning > Issue Fields), same names, org-wide. These project-local fields are still the ones the automation actually reads and writes for now - consolidating onto the org-level fields is a known follow-up, not done yet, since the sync automation would need rework to target them instead.
 
 **End date**: Epic-only, manual. Not derived from anything, not touched by automation. Only set once an Epic is genuinely done - it's a record of what actually happened, not a plan.
 
@@ -69,14 +73,14 @@ Use the existing weekly Monday meeting when a new iteration starts (every other 
 **Iteration-boundary Monday** (full triage): covers two iterations - the one starting now (finalized, real commitment) and the one after that (light preview only, see below). The second one matters less; don't spend equal effort on it.
 1. Review the **Needs Re-triage** view (items the automation bounced back to Backlog) - still the priority? Pull into the iteration starting now. Not right now? Leave in Backlog. Turned out bigger than expected? Split into an Epic instead of re-entering it as-is.
 2. Finalize the iteration that's starting: items staged as "next up" at the last triage are a non-binding preview, not a commitment - re-review each one now that it's real (given current capacity and priorities), don't rubber-stamp. This is issue-level and one iteration ahead only; picking which Objectives matter this quarter is a separate, coarser decision made at quarterly planning, not here.
-3. Triage new Backlog items: the board's **Triage** view (Status=Backlog, Pillar=blank, sorted oldest-first). For each, either set a Pillar/Objective and Priority, or mark it Reactive/not goal-linked. Pull top-priority items into the now-current iteration up to the In Progress column's limit (a soft cap, see column settings); stage a few likely candidates into "next" for visibility, to be properly reviewed at the following iteration boundary.
+3. Triage new Backlog items: the board's **Triage** view (Status=Backlog, Objective=blank, sorted oldest-first). For each, either set an Objective and Priority, or mark it Reactive/not goal-linked. Pull top-priority items into the now-current iteration up to the In Progress column's limit (a soft cap, see column settings); stage a few likely candidates into "next" for visibility, to be properly reviewed at the following iteration boundary.
 4. Epic check-in: anything the "no sub-issues after 2 weeks" nudge has flagged, or any Epic close to fully rolled up. Also check the **Active OKRs** view - it has its own WIP limit (separate from the execution board's) on how many Epics can be Status=In Progress at once. Blocked Epics free a slot; pull in the next-highest-priority in-focus Epic from Backlog, don't just start more on top. The point is to actually finish Epics rather than spread thin across many at once.
 
-**Mid-iteration Monday** (business as usual): triage any new issues into Backlog (Pillar/Objective/Priority). Nothing for the running iteration.
+**Mid-iteration Monday** (business as usual): triage any new issues into Backlog (Objective/Priority). Nothing for the running iteration.
 
 Only genuinely urgent work (something's broken or blocking users right now) skips triage and moves straight from Backlog to In Progress. Everything else goes through iteration planning, whether or not it's goal-linked - a deliberately scheduled upgrade or migration is triaged, sized, and scheduled into a cycle the same as goal-linked work, even though it'll end up tagged Reactive/not goal-linked. That tag means "doesn't serve a stated objective," not "wasn't planned" or "isn't important."
 
-There's a third type of work besides "urgent, skips the queue" and "goal-linked": small, cheap, non-urgent, non-goal-linked work (a stale doc update, ...) that will *always* be low priority compared to anything else and would otherwise sit in Backlog forever. Rather than forcing these through Size/Iteration scheduling they have no real timing need, mark them with the `opportunistic` label: picked up whenever someone has spare capacity, with no formal commitment to when and no Iteration assigned at all. If something's sat untouched for a long time even as "opportunistic" and nobody's ever picked it up, that could be a sign to close it rather than keeping it. The room for this comes from how the item limit in an iteration. Keep iteration planning deliberately below the team's full theoretical capacity.
+There's a third type of work besides "urgent, skips the queue" and "goal-linked": small, cheap, non-urgent, non-goal-linked work (a stale doc update, ...) that will *always* be low priority compared to anything else and would otherwise sit in Backlog forever. Rather than forcing these through Effort/Iteration scheduling they have no real timing need, mark them with the `opportunistic` label: picked up whenever someone has spare capacity, with no formal commitment to when and no Iteration assigned at all. If something's sat untouched for a long time even as "opportunistic" and nobody's ever picked it up, that could be a sign to close it rather than keeping it. The room for this comes from how the item limit in an iteration. Keep iteration planning deliberately below the team's full theoretical capacity.
 
 Sequencing goal-linked work is decided at quarterly roadmap review, at the Epic level, not the Objective level - see [docs/quarterly-planning.md](docs/quarterly-planning.md). Only Epics picked as in-focus get pulled into iterations; the rest stay tagged and visible on the roadmap.
 
@@ -106,13 +110,13 @@ Automated (see the workflows in this repo, and the board's own Settings > Workfl
 - A `blocked` label mirrors to Status=Blocked (and clears when the label is removed)
 - Items still open when their iteration ends are moved back to Backlog with Iteration cleared (Start/Target handled per the rules above), with a comment explaining what happened
 - Start/Target dates are kept in sync with Iteration whenever it changes
-- Pillar/Objective are copied down from a parent issue to its sub-issues, as long as the sub-issue's own Pillar is still blank - never overwrites a value already set. The OKR label and `[OKR]` title prefix are **not** propagated - those mark the top-level Objective-linked issue only, not every sub-issue under it. Polls every 30 min rather than reacting instantly (`sub_issues` is a webhook event, not a valid Actions trigger) - only as accurate as the underlying parent/child links, worth spot-checking those
-- Items entering In Progress with no Size set get a nudge comment
+- Objective is copied down from a parent issue to its sub-issues, and recursively on down to sub-sub-issues and beyond in the same run - never overwrites a value already set. The OKR label and `[OKR]` title prefix are **not** propagated - those mark the top-level Objective-linked issue only, not every sub-issue under it. Polls every 30 min rather than reacting instantly (`sub_issues` is a webhook event, not a valid Actions trigger) - only as accurate as the underlying parent/child links, worth spot-checking those
+- Items entering In Progress with no Effort set get a nudge comment
 - Epic-typed issues with no sub-issues after some time get a nudge comment
 
 Manual, by design:
-- Setting Priority above the P1/P2 defaults
-- Setting Pillar/Objective
+- Setting Priority above the High/Medium defaults
+- Setting Objective
 - Deciding an item is Reactive rather than just untriaged
 - Deciding whether an item bumped back to Backlog is still the priority (re-enter it) or not (leave it)
 - Deciding a stuck item should become an Epic instead of being re-entered as-is
