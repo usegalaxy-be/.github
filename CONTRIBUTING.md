@@ -60,6 +60,12 @@ Objective is the only field this board uses for goal-linkage - the coarser Pilla
 
 A Key Result that's a concrete deliverable becomes an Epic tagged with that Objective - also add the `OKR` label and an `[OKR]` title prefix, for visibility outside the project board too.
 
+These two markers work at different scopes, worth being deliberate about which one an issue gets:
+- **`Objective` field**: broad goal-linkage. Any issue that genuinely serves that Objective gets it, whether or not it's a headline deliverable - including ordinary supporting work that isn't itself a Key Result.
+- **`OKR` label / `[OKR]` prefix**: narrow, reserved for the actual Key-Result-defining Epics only (~15-20 items). Not propagated to sub-issues or to other work that merely serves the same Objective - see the automation notes below for why.
+
+An issue with `Objective` set but no `OKR` label is already a complete, correct state - "serves a goal, not itself the flagship deliverable." That doesn't need its own separate marker, it's directly visible from those two fields together.
+
 **Start date / Target date / End date**: all three are org-level Issue Fields (Settings > Planning > Issue Fields), not project fields - the same value is visible on the issue wherever it's tracked, not just here. `Start date`/`Target date` are pinned to show on every issue type; `End date` is pinned to `Epic` only, since it's only meaningful there.
 
 For regular (non-Epic) issues, `Start`/`Target` are automatically derived from the Iteration's window and kept in sync. Epics are the exception - see Issue types above, their Start/Target/End are set independently rather than derived. When a regular issue gets a new Iteration and already has a Start date, only Target moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and Target are set fresh to the new iteration's window.
