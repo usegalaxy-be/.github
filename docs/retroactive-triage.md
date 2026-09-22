@@ -27,10 +27,6 @@ No
 
 
 
-### Does this serve a 2026 Objective?
-
-Not sure yet - decide at triage
-
 ### Will any sub-part need an RFC?
 
 Not sure yet - decide at triage

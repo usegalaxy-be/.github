@@ -16,19 +16,6 @@ body:
       required: true
 
   - type: dropdown
-    id: goal-linked
-    attributes:
-      label: Does this serve a 2026 Objective?
-      description: If yes, tag the Objective on the project board and add the OKR label + [OKR] title prefix. If no, it'll get tagged Not objective-linked at triage - that's expected, not a problem.
-      options:
-        - "Yes - tied to a specific Objective"
-        - "No - not goal-linked"
-        - "Not sure yet - decide at triage"
-      default: 2
-    validations:
-      required: true
-
-  - type: dropdown
     id: rfc
     attributes:
       label: Will any sub-part need an RFC?
