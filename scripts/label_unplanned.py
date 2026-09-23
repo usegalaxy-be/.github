@@ -6,11 +6,14 @@ it was - see the "Unplanned work" section in CONTRIBUTING.md. Its purpose is
 to make the per-cycle share of uncommitted work measurable, which
 docs/quarterly-planning.md otherwise has to guess at.
 
-An item is labelled when it is Status = In Progress and either:
+An item is labelled when it is Status = In Progress, it entered that status
+during the iteration being judged (so a card parked In Progress in some
+earlier cycle isn't retroactively swept up), and either:
   - its Iteration was set after that iteration's grace window (the first day,
     which covers decisions made in the boundary Monday meeting), or
   - it has no Iteration at all - the `opportunistic` pickup case, real
-    capacity spent outside any commitment.
+    capacity spent outside any commitment. Judged against the project's
+    current iteration, since the item carries no window of its own.
 
 Epics are always skipped: they never get an Iteration by design, so there is
 no commitment for them to fall outside of.
@@ -40,6 +43,20 @@ GRACE_DAYS = int(os.environ.get("GRACE_DAYS", "1"))
 LABEL = "unplanned"
 IN_PROGRESS = "In Progress"
 
+ITERATION_CONFIG_QUERY = '''
+query {
+  organization(login: "__ORG__") {
+    projectV2(number: __PROJECT_NUMBER__) {
+      field(name: "Iteration") {
+        ... on ProjectV2IterationField {
+          configuration { iterations { title startDate duration } }
+        }
+      }
+    }
+  }
+}
+'''
+
 PROJECT_QUERY_TEMPLATE = '''
 query {
   organization(login: "__ORG__") {
@@ -54,7 +71,7 @@ query {
               labels(first: 30) { nodes { name } }
             }
           }
-          status: fieldValueByName(name: "Status") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
+          status: fieldValueByName(name: "Status") { ... on ProjectV2ItemFieldSingleSelectValue { name updatedAt } }
           iteration: fieldValueByName(name: "Iteration") { ... on ProjectV2ItemFieldIterationValue { title startDate updatedAt } }
         }
       }
@@ -98,6 +115,32 @@ def fetch_items():
     return items
 
 
+def fetch_current_iteration():
+    """The iteration whose window contains today, or None between iterations."""
+    q = (ITERATION_CONFIG_QUERY
+         .replace("__ORG__", ORG)
+         .replace("__PROJECT_NUMBER__", str(PROJECT_NUMBER)))
+    data = graphql(q)
+    if not data:
+        return None
+    field = (data.get("data", {}).get("organization", {})
+             .get("projectV2", {}) or {}).get("field") or {}
+    today = datetime.now(timezone.utc).date()
+    for it in (field.get("configuration") or {}).get("iterations", []):
+        start = datetime.fromisoformat(it["startDate"]).date()
+        if start <= today < start + timedelta(days=it["duration"]):
+            return it
+    return None
+
+
+def iteration_start(iteration):
+    return datetime.fromisoformat(iteration["startDate"]).replace(tzinfo=timezone.utc)
+
+
+def parse_ts(value):
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
 def add_label(issue_url):
     if DRY_RUN:
         print(f"[dry-run] would add '{LABEL}' to {issue_url}")
@@ -107,8 +150,7 @@ def add_label(issue_url):
 
 def grace_deadline(iteration):
     """End of the window in which setting an Iteration still counts as committed."""
-    start = datetime.fromisoformat(iteration["startDate"]).replace(tzinfo=timezone.utc)
-    return start + timedelta(days=GRACE_DAYS)
+    return iteration_start(iteration) + timedelta(days=GRACE_DAYS)
 
 
 def main():
@@ -118,6 +160,10 @@ def main():
     if not PROJECT_NUMBER:
         print("PROJECT_NUMBER not set, skipping")
         return
+
+    current_iteration = fetch_current_iteration()
+    if not current_iteration:
+        print("no iteration currently running - items with no Iteration can't be judged")
 
     items = fetch_items()
     if not items:
@@ -130,8 +176,8 @@ def main():
         if not content:
             continue
 
-        status = (item.get("status") or {}).get("name")
-        if status != IN_PROGRESS:
+        status = item.get("status") or {}
+        if status.get("name") != IN_PROGRESS:
             continue
 
         if (content.get("issueType") or {}).get("name") == "Epic":
@@ -143,14 +189,27 @@ def main():
 
         url = content["url"]
         iteration = item.get("iteration")
+
+        # Judge against the item's own iteration; with none, the running one.
+        window = iteration or current_iteration
+        if not window:
+            continue
+
+        # Only work actually picked up during that window counts. Without this,
+        # a card left sitting In Progress from an earlier cycle (or imported
+        # that way from another board) would be swept up on the first run.
+        started_at = parse_ts(status["updatedAt"])
+        if started_at < iteration_start(window):
+            continue
+
         if not iteration:
             # Worked on without ever entering an iteration - opportunistic pickup.
             add_label(url)
-            print(f"{url}: in progress with no iteration")
+            print(f"{url}: in progress during {window['title']} with no iteration set")
             labelled += 1
             continue
 
-        set_at = datetime.fromisoformat(iteration["updatedAt"].replace("Z", "+00:00"))
+        set_at = parse_ts(iteration["updatedAt"])
         deadline = grace_deadline(iteration)
         if set_at > deadline:
             add_label(url)
