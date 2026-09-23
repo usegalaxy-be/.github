@@ -33,7 +33,7 @@ Some Epics don't need a Target date set. We only set a real one when there's an 
 
 **Status**: Backlog / In Progress / Blocked / Done. Kept deliberately small so it can be driven by automation (see below).
 
-**Priority**: Urgent / High / Medium / Low. This is an org-level Issue Field (Settings > Planning > Issue Fields), not specific to this board - the same value is visible on the issue wherever it's tracked, not just here. Urgent is reserved for genuine escalations - never set automatically. As a starting default: goal-linked work (has an Objective) defaults to High, reactive work defaults to Medium. Low is a manual downgrade for things that matter even less than the reactive default, nothing defaults to it. Adjust as needed during triage.
+**Priority**: Urgent / High / Medium / Low. This is an org-level Issue Field (Settings > Planning > Issue Fields), not specific to this board - the same value is visible on the issue wherever it's tracked, not just here. Urgent is reserved for genuine escalations - never set automatically. As a starting default: goal-linked work (has an Objective) defaults to High, work tagged `Not objective-linked` defaults to Medium. Low is a manual downgrade for things that matter even less than that default, nothing defaults to it. Adjust as needed during triage.
 
 Unlike Effort and Iteration, Priority applies to Epics too - it's about relative importance, not execution scheduling, so it isn't tied to fitting in one cycle. An Epic's Priority is what should drive which initiatives get staffed; a sub-issue's Priority is more about ordering work within an Epic that's already been deemed worth doing.
 
@@ -100,6 +100,20 @@ Sequencing goal-linked work is decided at quarterly roadmap review, at the Epic 
 **When an item is still open at the end of its iteration**, this is handled automatically rather than left for someone to remember: it's moved back to Backlog and its Iteration is cleared, with a comment explaining why. Staying "in iteration" would implicitly claim it's still what's being worked on; going back to Backlog forces a fresh re-check at the next triage instead of assuming continuity. If it was In Progress, Start/Target are left as-is (a real trace that work was in flight); if it never actually started, Start/Target are cleared too since there's nothing to preserve.
 
 What's still a human call at that point: if it turned out bigger than expected, split it into an Epic instead of re-entering it as-is. Otherwise, decide at the next triage whether it's still the priority (pull it into the new iteration) or not (leave it in Backlog). An item that keeps bouncing back cycle after cycle is itself worth noticing - either it isn't the priority its label says, or capacity is being chronically eaten by work this board doesn't track at all.
+
+### Unplanned work
+
+The `unplanned` label marks anything worked on during an iteration that wasn't committed to that iteration at its boundary. It records *how the work arrived*, nothing else:
+
+- It says nothing about urgency. An incident that took the service down and a small item picked up because the cycle happened to have room both get the same label.
+- It says nothing about importance or goal-linkage. Unplanned work can be any Priority, objective-linked or not.
+- It isn't a criticism. Some unplanned work every cycle is normal, and the plan already assumes it.
+
+Apply it when the item moves to In Progress, not when it's filed. An issue that arrives mid-cycle and waits in Backlog for the next boundary is never unplanned - it got scheduled the normal way, just later. The distinction is commitment, not filing date.
+
+An `opportunistic` item that actually gets picked up during a cycle gets `unplanned` too. The two answer different questions: `opportunistic` is how the item is allowed to be scheduled (no Iteration, spare capacity only), `unplanned` is the fact that real capacity went to it outside what was committed.
+
+Why track it at all: [docs/quarterly-planning.md](docs/quarterly-planning.md) weighs what to take on against how much capacity realistically goes to unplanned work rather than theoretical full capacity. Without the label that share is a guess. Filtering an iteration by `label:unplanned` turns it into a number, and a cycle where most of the work carries it is worth discussing on its own.
 
 ## Pull requests
 

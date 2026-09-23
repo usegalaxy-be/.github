@@ -11,7 +11,7 @@ Quarterly, review all open Epics across all Objectives together (not pre-filtere
 ## What to weigh, per Epic
 
 - **Impact** - does progress here matter to someone who'll notice? eg: a real external deadline.
-- **Effort / capacity** - roughly how much team bandwidth this would take, weighed against how much capacity is realistically going to reactive work rather than theoretical full capacity.
+- **Effort / capacity** - roughly how much team bandwidth this would take, weighed against how much capacity is realistically going to unplanned work rather than theoretical full capacity (the `unplanned` label makes last quarter's share measurable, see CONTRIBUTING.md).
 - **Readiness** - is this well-scoped enough to actually work on, or still a vague idea? Well-scoped beats well-intentioned-but-undefined, even if the undefined one sounds more important.
 - **Dependency** - does this block or get blocked by another Epic, or by outside stakeholders (VSC, Data Center, VIB)?
 
