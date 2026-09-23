@@ -110,7 +110,7 @@ The `unplanned` label marks anything worked on during an iteration that wasn't c
 - It isn't a criticism. Some unplanned work every cycle is normal, and the plan already assumes it.
 - It doesn't apply to Epics. Epics never get an Iteration in the first place (see Issue types above), so there's no commitment for them to fall outside of. This label is about iteration capacity, and only non-Epic items are scheduled that way.
 
-Apply it when the item moves to In Progress, not when it's filed. An issue that arrives mid-cycle and waits in Backlog for the next boundary is never unplanned - it got scheduled the normal way, just later. The distinction is commitment, not filing date.
+It's applied automatically, when the item moves to In Progress rather than when it's filed. An issue that arrives mid-cycle and waits in Backlog for the next boundary is never unplanned - it got scheduled the normal way, just later. The distinction is commitment, not filing date.
 
 An `opportunistic` item that actually gets picked up during a cycle gets `unplanned` too. The two answer different questions: `opportunistic` is how the item is allowed to be scheduled (no Iteration, spare capacity only), `unplanned` is the fact that real capacity went to it outside what was committed.
 
@@ -134,12 +134,12 @@ Automated (see the workflows in this repo, and the board's own Settings > Workfl
 - New issues/PRs are added to the execution board with Status=Backlog
 - Closing an issue sets Status=Done (merging a linked PR does not, by itself - see Pull requests above)
 - Reopening an issue resets Status=Backlog
-- Done items are archived from the board after 14 days
 - A `blocked` label mirrors to Status=Blocked (and clears when the label is removed)
 - Items still open when their iteration ends are moved back to Backlog with Iteration cleared (Start/Target handled per the rules above), with a comment explaining what happened
 - Start/Target dates are kept in sync with Iteration whenever it changes
 - Objective is kept in sync from a parent issue down to its sub-issues, and recursively on down to sub-sub-issues and beyond in the same run - the parent is authoritative, so this overwrites a stale or mismatched Objective, not just blanks. Mark an item `Not objective-linked` if it should genuinely be exempt from its parent's goal-linkage, that's the one value inheritance never overrides. The OKR label and `[OKR]` title prefix are **not** propagated - those mark the top-level Objective-linked issue only, not every sub-issue under it. Polls every 30 min rather than reacting instantly (`sub_issues` is a webhook event, not a valid Actions trigger) - only as accurate as the underlying parent/child links, worth spot-checking those. Scheduled runs aren't fully reliable (GitHub can silently drop a queued cron run under load), worth a manual trigger if something looks stale
 - Items entering In Progress with no Effort set get a nudge comment
+- Non-Epic items worked on inside an iteration they weren't committed to get the `unplanned` label, either because their Iteration was set after the boundary or because they have none at all. Never removed once applied - it's a record, not a state
 - Epic-typed issues with no sub-issues after some time get a nudge comment
 
 Manual, by design:
@@ -147,6 +147,7 @@ Manual, by design:
 - Setting Objective
 - Deciding an item is Not objective-linked rather than just untriaged
 - Deciding whether an item bumped back to Backlog is still the priority (re-enter it) or not (leave it)
+- Judging whether a cycle's share of `unplanned` work is acceptable, and what to do about it
 - Deciding a stuck item should become an Epic instead of being re-entered as-is
 - Setting/revisiting an Epic's Start/Target dates, and setting End once it's genuinely done
 - Closing an issue once its deploy is verified (for anything not using `Closes #123`)

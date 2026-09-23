@@ -1,0 +1,33 @@
+name: Label unplanned work
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"  # every 30 min, so a mid-cycle pickup is caught while it's current
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Log what would change instead of writing it"
+        type: boolean
+        default: true
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    env:
+      HAS_TOKEN: ${{ secrets.PROJECTS_TOKEN != '' }}
+    steps:
+      - name: Skip if not activated
+        if: ${{ env.HAS_TOKEN != 'true' }}
+        run: echo "PROJECTS_TOKEN not set, skipping (automation not yet activated)."
+
+      - uses: actions/checkout@v4
+        if: ${{ env.HAS_TOKEN == 'true' }}
+
+      - name: Label unplanned work
+        if: ${{ env.HAS_TOKEN == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ORG: usegalaxy-be
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: python3 scripts/label_unplanned.py
