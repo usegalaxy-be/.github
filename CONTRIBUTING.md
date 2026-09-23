@@ -108,6 +108,7 @@ The `unplanned` label marks anything worked on during an iteration that wasn't c
 - It says nothing about urgency. An incident that took the service down and a small item picked up because the cycle happened to have room both get the same label.
 - It says nothing about importance or goal-linkage. Unplanned work can be any Priority, objective-linked or not.
 - It isn't a criticism. Some unplanned work every cycle is normal, and the plan already assumes it.
+- It doesn't apply to Epics. Epics never get an Iteration in the first place (see Issue types above), so there's no commitment for them to fall outside of. This label is about iteration capacity, and only non-Epic items are scheduled that way.
 
 Apply it when the item moves to In Progress, not when it's filed. An issue that arrives mid-cycle and waits in Backlog for the next boundary is never unplanned - it got scheduled the normal way, just later. The distinction is commitment, not filing date.
 
