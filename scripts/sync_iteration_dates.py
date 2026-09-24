@@ -83,11 +83,15 @@ def fetch_org_date_field_ids():
     q = ORG_DATE_FIELDS_QUERY.replace("__ORG__", ORG)
     data = graphql(q)
     if not data or not data.get("data", {}).get("organization"):
+        print(f"org issueFields query returned nothing usable: {data}", file=sys.stderr)
         return None
     fields = {}
     for node in data["data"]["organization"]["issueFields"]["nodes"]:
         if node.get("__typename") == "IssueFieldDate":
             fields[node["name"]] = node["id"]
+    if "Start date" not in fields or "Target date" not in fields:
+        print(f"org issueFields visible to this token: {sorted(fields)} "
+              f"(raw: {data['data']['organization']['issueFields']})", file=sys.stderr)
     return fields
 
 

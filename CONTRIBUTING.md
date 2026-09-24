@@ -24,7 +24,7 @@ If an issue is accumulating a checklist of more than 2-3 sub-parts inside its ow
 
 Epics don't get an Effort or an Iteration of their own. Each sub-issue gets its own Effort and is scheduled individually.
 
-Epics *do* get their own Start/Target/End dates - Target and End are different things and both matter: Target is the estimate (a projection, revisable as things change), End is filled in only once the Epic is actually done, recording what really happened. The gap between the two is useful information on its own (how far off was the estimate), not just planning noise.
+Epics *do* get their own Start/Target/End dates - Target and End are different things and both matter: Target is the estimate (a projection, revisable as things change), End is filled in only once the Epic is actually done, recording what really happened (automatically, from the close date). The gap between the two is useful information on its own (how far off was the estimate), not just planning noise.
 
 Some Epics don't need a Target date set. We only set a real one when there's an actual driver (a leadership commitment, an external deadline, something else depending on it) - a rough estimate is fine, it doesn't need to be a hard commitment, but it needs *some* genuine basis. Don't set End before the Epic is genuinely finished.
 
@@ -66,11 +66,11 @@ These two markers work at different scopes, worth being deliberate about which o
 
 An issue with `Objective` set but no `OKR` label is already a complete, correct state - "serves a goal, not itself the flagship deliverable." That doesn't need its own separate marker, it's directly visible from those two fields together.
 
-**Start date / Target date / End date**: all three are org-level Issue Fields (Settings > Planning > Issue Fields), not project fields - the same value is visible on the issue wherever it's tracked, not just here. `Start date`/`Target date` are pinned to show on every issue type; `End date` is pinned to `Epic` only, since it's only meaningful there.
+**Start date / Target date / End date**: all three are org-level Issue Fields (Settings > Planning > Issue Fields), not project fields - the same value is visible on the issue wherever it's tracked, not just here. All three are pinned to show on every issue type.
 
 For regular (non-Epic) issues, `Start`/`Target` are automatically derived from the Iteration's window and kept in sync. Epics are the exception - see Issue types above, their Start/Target/End are set independently rather than derived. When a regular issue gets a new Iteration and already has a Start date, only Target moves forward - Start is preserved so the Roadmap bar visibly stretches across iterations instead of quietly resetting to looking on-track every cycle. If Start is blank (the item never actually got started - see below), both Start and Target are set fresh to the new iteration's window.
 
-`End date` is manual, not derived from anything, not touched by automation. Only set once an Epic is genuinely done - it's a record of what actually happened, not a plan.
+`End date` is set automatically when an item reaches Status = Done, from the issue's own close date, so it records when the work actually finished rather than which cycle it was planned for. It is never overwritten: a date already filled in by hand stays, including the far-future bound a long-running OKR Epic may carry while it is still in progress. A reopened item keeps its old End date until someone clears it by hand.
 
 ## Triage
 
@@ -137,6 +137,7 @@ Automated (see the workflows in this repo, and the board's own Settings > Workfl
 - A `blocked` label mirrors to Status=Blocked (and clears when the label is removed)
 - Items still open when their iteration ends are moved back to Backlog with Iteration cleared (Start/Target handled per the rules above), with a comment explaining what happened
 - Start/Target dates are kept in sync with Iteration whenever it changes
+- End date is set from the issue's close date once an item reaches Status = Done, whatever iteration it ended up in. Never overwritten, so a hand-entered date wins
 - Objective is kept in sync from a parent issue down to its sub-issues, and recursively on down to sub-sub-issues and beyond in the same run - the parent is authoritative, so this overwrites a stale or mismatched Objective, not just blanks. Mark an item `Not objective-linked` if it should genuinely be exempt from its parent's goal-linkage, that's the one value inheritance never overrides. The OKR label and `[OKR]` title prefix are **not** propagated - those mark the top-level Objective-linked issue only, not every sub-issue under it. Polls every 30 min rather than reacting instantly (`sub_issues` is a webhook event, not a valid Actions trigger) - only as accurate as the underlying parent/child links, worth spot-checking those. Scheduled runs aren't fully reliable (GitHub can silently drop a queued cron run under load), worth a manual trigger if something looks stale
 - Items entering In Progress with no Effort set get a nudge comment
 - Non-Epic items worked on inside an iteration they weren't committed to get the `unplanned` label, either because their Iteration was set after the boundary or because they have none at all. Only counts items that entered In Progress during that cycle, so a card left sitting in the column from an earlier one isn't swept up. Never removed once applied - it's a record, not a state
@@ -149,7 +150,7 @@ Manual, by design:
 - Deciding whether an item bumped back to Backlog is still the priority (re-enter it) or not (leave it)
 - Judging whether a cycle's share of `unplanned` work is acceptable, and what to do about it
 - Deciding a stuck item should become an Epic instead of being re-entered as-is
-- Setting/revisiting an Epic's Start/Target dates, and setting End once it's genuinely done
+- Setting/revisiting an Epic's Start/Target dates, and clearing an End date that a reopen made wrong
 - Closing an issue once its deploy is verified (for anything not using `Closes #123`)
 
 See [docs/references.md](docs/references.md) for the non-GitHub-specific methodology this is based on. New issues use the org-wide **Task/Bug/Feature** or **Epic** templates by default (`.github/ISSUE_TEMPLATE/`), which bake in the iteration-fit checklist and Epic conventions above.

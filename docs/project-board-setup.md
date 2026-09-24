@@ -17,6 +17,8 @@ Deliberately **not** configuring "Pull request merged -> Status: Done" - see the
 
 Also confirm **auto-add** (same menu) is scoped to include all 9 tracked repos.
 
+Under org Settings -> Planning -> Issue Fields, `Start date`, `Target date` and `End date` all need to be pinned to every issue type, not just `Epic` - the automation writes End date on any Done item, and an unpinned field stays invisible on the issue itself.
+
 ## 2. Activating the Actions in this repo
 
 The workflows in `.github/workflows/` here (`scheduled-nudges.yml`, `sync-iteration-dates.yml`, `sync-okr-inheritance.yml`, `label-status-sync.yml`) are committed but inert - every job checks for a `PROJECTS_TOKEN` secret and no-ops if it's missing, so nothing runs or fails noisily until you turn it on.

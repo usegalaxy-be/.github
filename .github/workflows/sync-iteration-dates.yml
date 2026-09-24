@@ -1,4 +1,4 @@
-name: Sync iteration dates
+name: Sync planning dates
 
 on:
   schedule:
@@ -31,3 +31,12 @@ jobs:
           PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
         run: python3 scripts/sync_iteration_dates.py
+
+      - name: Sync end dates
+        if: ${{ env.HAS_TOKEN == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ORG: usegalaxy-be
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: python3 scripts/sync_end_date.py
