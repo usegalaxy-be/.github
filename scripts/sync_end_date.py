@@ -79,10 +79,13 @@ def fetch_end_date_field_id():
     q = ORG_DATE_FIELDS_QUERY.replace("__ORG__", ORG)
     data = graphql(q)
     if not data or not data.get("data", {}).get("organization"):
+        print(f"org issueFields query returned nothing usable: {data}", file=sys.stderr)
         return None
-    for node in data["data"]["organization"]["issueFields"]["nodes"]:
+    nodes = data["data"]["organization"]["issueFields"]["nodes"]
+    for node in nodes:
         if node.get("__typename") == "IssueFieldDate" and node["name"] == "End date":
             return node["id"]
+    print(f"End date not among the org issueFields visible to this token: {nodes}", file=sys.stderr)
     return None
 
 
