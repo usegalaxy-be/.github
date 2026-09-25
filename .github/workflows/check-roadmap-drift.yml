@@ -1,0 +1,33 @@
+name: Check roadmap drift
+
+on:
+  schedule:
+    - cron: "0 7 * * *"  # daily, the dates being compared only change by the day
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Log what would be labelled instead of writing it"
+        type: boolean
+        default: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      HAS_TOKEN: ${{ secrets.PROJECTS_TOKEN != '' }}
+    steps:
+      - name: Skip if not activated
+        if: ${{ env.HAS_TOKEN != 'true' }}
+        run: echo "PROJECTS_TOKEN not set, skipping (automation not yet activated)."
+
+      - uses: actions/checkout@v4
+        if: ${{ env.HAS_TOKEN == 'true' }}
+
+      - name: Check roadmap drift
+        if: ${{ env.HAS_TOKEN == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ORG: usegalaxy-be
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: python3 scripts/check_roadmap_drift.py
