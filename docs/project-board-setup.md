@@ -21,7 +21,7 @@ Under org Settings -> Planning -> Issue Fields, `Start date`, `Target date` and 
 
 ## 2. Activating the Actions in this repo
 
-The workflows in `.github/workflows/` here (`scheduled-nudges.yml`, `sync-iteration-dates.yml`, `sync-okr-inheritance.yml`, `label-status-sync.yml`) are committed but inert - every job checks for a `PROJECTS_TOKEN` secret and no-ops if it's missing, so nothing runs or fails noisily until you turn it on.
+The workflows in `.github/workflows/` here (`scheduled-nudges.yml`, `sync-iteration-dates.yml`, `sync-okr-inheritance.yml`, `label-status-sync.yml`, `label-unplanned.yml`, `check-roadmap-drift.yml`) are committed but inert - every job checks for a `PROJECTS_TOKEN` secret and no-ops if it's missing, so nothing runs or fails noisily until you turn it on.
 
 To activate:
 
@@ -30,6 +30,16 @@ To activate:
 3. Add an **organization variable** named `PROJECT_NUMBER` set to the number of the live execution board (org Settings -> Secrets and variables -> Actions -> Variables tab). Also update `projects: ["usegalaxy-be/8"]` in both issue templates (`.github/ISSUE_TEMPLATE/*.yml`) to match - currently hardcoded to `#8` until the `#8`/`#12` migration decision is made.
 4. Add the caller workflow (`templates/label-status-sync-caller.yml` in this repo) to each of the 9 tracked repos' `.github/workflows/` directory - already done as part of this rollout, nothing further needed unless a new repo joins the tracked set later.
 5. Trigger `scheduled-nudges.yml` manually once via **Run workflow** (with `dry_run: true` first) to confirm it can reach the project before waiting for the next Monday cron.
+
+## Labels the automation writes
+
+`blocked`, `needs-retriage`, `needs-clarification`, `unplanned`, `opportunistic` and `roadmap-drift` all need to exist in every tracked repo - `gh label create` fails silently into the script's stderr otherwise. To add one across the set:
+
+```
+for r in infrastructure-playbook usegalaxy-be-tools galaxytools usegalaxy-be-doc usegalaxy-be.github.io infrastructure pulsar-deployment metrics_internal issues; do
+  gh label create roadmap-drift --repo usegalaxy-be/$r -c D93F0B -d "Epic window no longer matches the work running under it" 2>&1 | tail -1
+done
+```
 
 ## Tracked repos
 

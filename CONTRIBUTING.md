@@ -81,7 +81,7 @@ Use the existing weekly Monday meeting, in two different modes depending on wher
 1. **Triage new issues**: the board's **Triage** view (anything missing label/assignee/Objective/Type/Status). "New" means untriaged, not necessarily created since the last meeting - an old item that slipped through counts too. For each, set Objective and Priority (or mark it Not objective-linked), confirm the Type is right, add labels as applicable. Effort is *not* set here, see the Effort field notes above for why. Pre-dates the templates, or was filed without one? See [docs/retroactive-triage.md](docs/retroactive-triage.md) for a copy-paste comment block that gives it the same structure. If an issue genuinely can't be classified as written, mark it `needs-clarification` instead of guessing at field values to move it along - it stays visible in Triage either way, the label just means whoever reopens it next doesn't have to re-diagnose it from scratch.
 2. **Re-triage leftover issues**: the board's **Needs Re-triage** view (items the automation bounced back to Backlog because their iteration ended while they were still open). Still the priority? It's already triaged from before, nothing more to do, it's ready for step 3. Turned out bigger or different than expected? Adjust Effort/Type, rewrite the description, split into sub-issues if it's really an Epic. Not right now? Leave it - it'll keep resurfacing here every cycle until it's either scheduled or someone clears the `needs-retriage` label by hand, and an item that keeps bouncing is itself worth noticing.
 3. **Schedule**: the board's **Ready to schedule** view, grouped by Priority and sorted by Effort. Covers everything triaged in steps 1 and 2 together - by this point they're indistinguishable, both just triaged Backlog work competing on the same criteria. Pull top items into the now-starting iteration up to the In Progress column's limit (a soft cap, see column settings); stage a few likely candidates into "next" as a non-binding preview, re-reviewed for real (not rubber-stamped) at the following boundary. This is issue-level and one iteration ahead only; picking which Objectives matter this quarter is a separate, coarser decision made at quarterly planning, not here.
-4. **Epic check-in**: anything the "no sub-issues after 2 weeks" nudge has flagged, or any Epic close to fully rolled up. Also check the **Active OKRs** view - it has its own WIP limit (separate from the execution board's) on how many Epics can be Status=In Progress at once. Blocked Epics free a slot; pull in the next-highest-priority in-focus Epic from Backlog, don't just start more on top. The point is to actually finish Epics rather than spread thin across many at once.
+4. **Epic check-in**: anything the "no sub-issues after 2 weeks" nudge has flagged, anything carrying `roadmap-drift` (see Roadmap drift below), or any Epic close to fully rolled up. Also check the **Active OKRs** view - it has its own WIP limit (separate from the execution board's) on how many Epics can be Status=In Progress at once. Blocked Epics free a slot; pull in the next-highest-priority in-focus Epic from Backlog, don't just start more on top. The point is to actually finish Epics rather than spread thin across many at once.
 
 **Mid-iteration Monday** (business as usual, no scheduling decisions):
 - Triage new issues, same as step 1 above, so the backlog doesn't pile up untriaged between boundaries.
@@ -116,6 +116,21 @@ An `opportunistic` item that actually gets picked up during a cycle gets `unplan
 
 Why track it at all: [docs/quarterly-planning.md](docs/quarterly-planning.md) weighs what to take on against how much capacity realistically goes to unplanned work rather than theoretical full capacity. Without the label that share is a guess. Filtering an iteration by `label:unplanned` turns it into a number, and a cycle where most of the work carries it is worth discussing on its own.
 
+### Roadmap drift
+
+The roadmap and the iterations are two views of the same work, so they should agree: if a sub-issue is being worked on now, the Epic above it should be an initiative that is actually active - Status = In Progress, and inside its own Start/Target window. When they don't agree, the Roadmap view draws a bar that has nothing to do with what the team is doing, and an Epic that shows as finished (or not yet started) keeps accumulating work underneath it.
+
+The `roadmap-drift` label marks an Epic where that has happened. It's applied automatically to an Epic with live work under it (the Epic itself In Progress, or any of its descendants) when any of these is true:
+
+- the Epic isn't In Progress while work under it is
+- the Epic has no Start date
+- the Epic's Start date is later than the start of the work under it
+- the Epic's Target date is earlier than the target of the work under it
+
+No Target date at all isn't drift - an Epic without a real driver is allowed to carry none (see Issue types above).
+
+The Epic's dates are never rewritten by the automation. A window is a human judgement, and the right fix depends on which side is wrong: move the Epic's Target because the initiative genuinely runs longer, or stop pulling sub-issues into an Epic that was supposed to be finished. Unlike `unplanned`, this label is a live state and not a record - it's removed again as soon as the two agree, so what's labelled is always a current disagreement.
+
 ## Pull requests
 
 Merging is not the same as done. Most of this work deploys via a separate playbook run, a merged PR just means the code is in `main`, not that it's live. Status=Done only happens when the issue is actually closed, and that's a decision for whoever verifies the deploy, not something that fires automatically on merge.
@@ -142,6 +157,7 @@ Automated (see the workflows in this repo, and the board's own Settings > Workfl
 - Items entering In Progress with no Effort set get a nudge comment
 - Non-Epic items worked on inside an iteration they weren't committed to get the `unplanned` label, either because their Iteration was set after the boundary or because they have none at all. Only counts items that entered In Progress during that cycle, so a card left sitting in the column from an earlier one isn't swept up. Never removed once applied - it's a record, not a state
 - Epic-typed issues with no sub-issues after some time get a nudge comment
+- Epics whose own Start/Target window or Status no longer matches the work running under them get the `roadmap-drift` label, removed again once they line up. The Epic's dates are never changed automatically
 
 Manual, by design:
 - Setting Priority above the High/Medium defaults
@@ -151,6 +167,7 @@ Manual, by design:
 - Judging whether a cycle's share of `unplanned` work is acceptable, and what to do about it
 - Deciding a stuck item should become an Epic instead of being re-entered as-is
 - Setting/revisiting an Epic's Start/Target dates, and clearing an End date that a reopen made wrong
+- Resolving a `roadmap-drift` flag: deciding whether the Epic's window should move, or whether the work under it shouldn't be running yet
 - Closing an issue once its deploy is verified (for anything not using `Closes #123`)
 
 See [docs/references.md](docs/references.md) for the non-GitHub-specific methodology this is based on. New issues use the org-wide **Task/Bug/Feature** or **Epic** templates by default (`.github/ISSUE_TEMPLATE/`), which bake in the iteration-fit checklist and Epic conventions above.
