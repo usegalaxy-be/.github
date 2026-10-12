@@ -175,15 +175,13 @@ def main():
         iter_start = datetime.fromisoformat(iteration["startDate"]).date()
         iter_end = iter_start + timedelta(days=iteration["duration"] - 1)
 
+        # Scheduled into an iteration, so re-triage is done.
+        if "needs-retriage" in labels:
+            remove_label(url, "needs-retriage")
+
         current_target = values.get("Target date")
         if current_target == str(iter_end):
             continue  # already consistent, nothing to do
-
-        # A real Iteration (re)assignment just happened - if this item was
-        # sitting with needs-retriage (bounced back by nudge_stale_items.py),
-        # that's now resolved.
-        if "needs-retriage" in labels:
-            remove_label(url, "needs-retriage")
 
         current_start = values.get("Start date")
         if current_start:
