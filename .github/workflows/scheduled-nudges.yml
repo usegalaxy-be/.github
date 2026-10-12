@@ -23,6 +23,15 @@ jobs:
       - uses: actions/checkout@v4
         if: ${{ env.HAS_TOKEN == 'true' }}
 
+      - name: Keep upcoming iterations
+        if: ${{ env.HAS_TOKEN == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ORG: usegalaxy-be
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: python3 scripts/ensure_iterations.py
+
       - name: Run nudges
         if: ${{ env.HAS_TOKEN == 'true' }}
         env:
