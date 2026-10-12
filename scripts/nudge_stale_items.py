@@ -33,7 +33,6 @@ ORG = os.environ.get("ORG", "usegalaxy-be")
 PROJECT_NUMBER = os.environ.get("PROJECT_NUMBER")
 DRY_RUN = os.environ.get("DRY_RUN") == "true"
 
-MARKER_ITERATION = "<!-- nudge:stale-iteration-rollover -->"
 MARKER_EFFORT = "<!-- nudge:missing-effort -->"
 MARKER_EPIC = "<!-- nudge:epic-no-subissues -->"
 
@@ -264,20 +263,9 @@ def main():
                            project["status_options"]["Backlog"])
                 clear_field(project["id"], item["id"], project["iteration_field_id"])
                 add_label(url, "needs-retriage")
-                if was_in_progress:
-                    note = ("It was In Progress, so Start/Target dates are left as-is - a visible "
-                            "record that real work was in flight from Start through the iteration "
-                            "that just ended.")
-                else:
+                if not was_in_progress:
                     clear_issue_date(issue_id, date_fields["Start date"])
                     clear_issue_date(issue_id, date_fields["Target date"])
-                    note = "It was never started, so Start/Target dates were cleared too."
-                comment(url, MARKER_ITERATION,
-                        f"Its iteration (**{iteration['title']}**, ended {end.date()}) has passed "
-                        f"and this is still open, so it's been moved back to **Backlog** and its "
-                        f"Iteration cleared for re-triage. {note}\n\n"
-                        f"If it turned out bigger than expected, split it into an Epic with "
-                        f"sub-issues instead of re-entering it as-is.")
 
         if status == "In Progress" and not effort and issue_type != "Epic" and not is_opportunistic:
             comment(url, MARKER_EFFORT,
