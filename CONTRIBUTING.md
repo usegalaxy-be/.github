@@ -135,9 +135,9 @@ The Epic's dates are never rewritten by the automation. A window is a human judg
 
 Merging is not the same as done. Most of this work deploys via a separate playbook run, a merged PR just means the code is in `main`, not that it's live. Status=Done only happens when the issue is actually closed, and that's a decision for whoever verifies the deploy, not something that fires automatically on merge.
 
-How you reference the issue in the PR depends on which is true for that repo/change:
-- **Merge effectively is deploy** (e.g. a docs site that publishes on merge): use `Closes #123`. GitHub auto-closes the issue when this PR merges, which then triggers Status=Done. Fine as-is.
-- **Merge implies a manual deploy step** (most repos, most of the time): use `Relates to #123` instead. This links the PR to the issue for traceability without auto-closing anything. Close the issue by hand once the deploy is verified.
+Open the PR description with "This PR addresses [issue title](link)." The link also shows the PR on the issue. Whether the issue closes on merge depends on which is true for that repo/change:
+- **Merge effectively is deploy** (e.g. a docs site that publishes on merge): add `Closes #123` on its own line. GitHub auto-closes the issue when this PR merges, which then triggers Status=Done.
+- **Merge implies a manual deploy step** (most repos, most of the time): the opening line is enough. Close the issue by hand once the deploy is verified.
 
 This also settles what to do about multiple PRs on one issue: since closing is decoupled from any individual PR merging, it doesn't matter how many PRs are linked or in what order they merge - closing is still one deliberate action once the work is actually live.
 
