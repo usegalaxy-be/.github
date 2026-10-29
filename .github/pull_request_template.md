@@ -6,6 +6,8 @@ This PR addresses [issue title](link).
 
 ## How to test
 
+<!-- Without a test environment (for example the website or docs), one check after merging is enough. -->
+
 After deploying to test:
 - <!-- One simple check per change: a tool run in the UI, or one copy-pasteable command. -->
 
