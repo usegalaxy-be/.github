@@ -171,4 +171,4 @@ Manual, by design:
 - Resolving a `roadmap-drift` flag: deciding whether the Epic's window should move, or whether the work under it shouldn't be running yet
 - Closing an issue once its deploy is verified (for anything not using `Closes #123`)
 
-See [docs/references.md](docs/references.md) for the non-GitHub-specific methodology this is based on. New issues use the org-wide **Task/Bug/Feature** or **Epic** templates by default (`.github/ISSUE_TEMPLATE/`), which bake in the iteration-fit checklist and Epic conventions above.
+See [docs/references.md](docs/references.md) for the non-GitHub-specific methodology this is based on. New issues use the org-wide **Task/Feature**, **Bug** or **Epic** templates by default (`.github/ISSUE_TEMPLATE/`), which bake in the iteration-fit checklist and Epic conventions above.
