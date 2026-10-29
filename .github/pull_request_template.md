@@ -14,16 +14,15 @@ After deploying to prod:
 
 ## How to deploy
 
-<!-- Delete this section when merging is the deploy. -->
-
-```
-# cd into the worktree
-git fetch origin && git merge origin/main
-ansible-playbook <playbook> --limit <test hosts> --check --diff
-ansible-playbook <playbook> --limit <test hosts>
-```
-
-Then the same for prod.
+<!--
+The steps to make this change live, test before prod. Delete this section when merging is the deploy.
+For an Ansible playbook, for example:
+  # cd into the worktree
+  git fetch origin && git merge origin/main
+  ansible-playbook <playbook> --limit <test hosts> --check --diff
+  ansible-playbook <playbook> --limit <test hosts>
+  then the same for prod.
+-->
 
 ## RFC
 
