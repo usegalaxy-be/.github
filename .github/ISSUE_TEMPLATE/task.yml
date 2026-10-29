@@ -1,5 +1,5 @@
-name: Task / Bug / Feature
-description: General work item. If you already know this is a multi-part initiative, use the Epic template instead.
+name: Task / Feature
+description: General work item. For something that is broken, use the Bug template. If you already know this is a multi-part initiative, use the Epic template instead.
 projects: ["usegalaxy-be/12"]
 body:
   - type: markdown

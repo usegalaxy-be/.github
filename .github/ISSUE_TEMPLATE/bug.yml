@@ -1,0 +1,39 @@
+name: Bug
+description: Something that worked before, or should work, is broken.
+type: Bug
+projects: ["usegalaxy-be/12"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: A screenshot or error message helps.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options:
+        - "Prod (usegalaxy.be)"
+        - "Test (test.usegalaxy.be)"
+        - "Both"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: how-to-see
+    attributes:
+      label: How to see it
+      description: The steps, a link to the page, tool or job, or a command.
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: false
